@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright © 2022 Ralph Seichter
 #
 # This file is part of PostQF.
@@ -26,6 +24,9 @@ from logging import getLogger
 from re import Pattern
 from typing import List
 from typing import Optional
+
+from postqf import PROGRAM
+from postqf import VERSION
 
 
 def create_logger(log_level: int) -> Logger:
@@ -149,7 +150,7 @@ def process_files() -> None:
 
 def parse_args() -> Namespace:
     """Parse command line arguments."""
-    p = ArgumentParser()
+    p = ArgumentParser(prog=PROGRAM, epilog=f'{PROGRAM} {VERSION} Copyright © 2022 Ralph Seichter')
     p.add_argument('-d', dest='reason', metavar='REGEX', nargs='?', default='.', help=f'Delay reason filter')
     p.add_argument('-q', dest='qname', metavar='REGEX', nargs='?', default='.', help=f'Queue name filter')
     p.add_argument('-r', dest='recipient', metavar='REGEX', nargs='?', default='.', help=f'Recipient address filter')
