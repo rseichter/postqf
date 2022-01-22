@@ -3,7 +3,7 @@
 PYPI_REPO	?= testpypi
 VENV		= $(shell realpath .venv)
 
-.PHONY:		clean dist prep pypi-upload usage
+.PHONY:		clean dist prep pypi-upload setver usage
 
 usage:
 	@echo >&2 "Usage: make {clean | dist | pypi-upload}"
@@ -19,3 +19,11 @@ prep:
 
 pypi-upload:	prep
 	twine upload --sign --identity 6AE2A84723D56D985B340BC08E5FA4709F69E911 --repository $(PYPI_REPO) dist/*
+
+V	?= $(shell echo "0.1.dev$$(date -u +'%j%H%M')")
+VQ	= '$(V)'
+SED	= sed -i"" -E -e "s/(^version =).*/\1
+
+setver:
+	$(SED) $(VQ)/i" postqf/__init__.py
+	$(SED) $(V)/i" setup.cfg
