@@ -35,8 +35,8 @@ Find all messages in the _deferred_ queue where the delay reason contains the st
 postqueue -j | postqf -q deferred -d 'connection timed out'
 ```
 
-Find all messages in the _active_ or _hold_ queues which have at least one recipient in the _example.com_ or _
-example.org_ domains, and write the matching JSON records into the file _/tmp/output_.
+Find all messages in the _active_ or _hold_ queues which have at least one recipient in the _example.com_ or
+_example.org_ domains, and write the matching JSON records into the file _/tmp/output_.
 
 ```bash
 postqueue -j | postqf -q 'active|hold' -r '@example\.(com|org)' -o /tmp/output
