@@ -162,11 +162,11 @@ def parse_args() -> Namespace:
     p.add_argument('-q', dest='qname', metavar='REGEX', nargs='?', default='.', help=f'Queue name filter')
     p.add_argument('-r', dest='recipient', metavar='REGEX', nargs='?', default='.', help=f'Recipient address filter')
     p.add_argument('-s', dest='sender', metavar='REGEX', nargs='?', default='.', help=f'Sender address filter')
-    p.add_argument('-i', dest='queue_id', action='store_true', help=f'Output only queue IDs')
+    p.add_argument('-i', dest='queue_id', action='store_true', help=f'Output only raw queue IDs')
     p.add_argument('-l', dest='level', metavar='LEVEL', nargs='?', default='WARNING',
                    help=f'Log level (default: WARNING)')
     p.add_argument('-o', dest='outfile', metavar='PATH', nargs='?', default='-',
-                   help='Input file. Use a dash "-" for standard output.')
+                   help='Output file. Use a dash "-" for standard output.')
     p.add_argument('infile', metavar='PATH', nargs='*', default='-',
                    help='Input file. Use a dash "-" for standard input.')
     return p.parse_args()
