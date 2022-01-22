@@ -35,15 +35,15 @@ Find all messages in the _deferred_ queue where the delay reason contains the st
 postqueue -j | postqf -q deferred -d 'connection timed out'
 ```
 
-Find all messages in the _active_ or _hold_ queues which have at least one recipient in the example.com or example.org
-domains, and write the matching JSON records into the file _/tmp/output_.
+Find all messages in the _active_ or _hold_ queues which have at least one recipient in the _example.com_ or _
+example.org_ domains, and write the matching JSON records into the file _/tmp/output_.
 
 ```bash
 postqueue -j | postqf -q 'active|hold' -r '@example\.(com|org)' -o /tmp/output
 ```
 
-Find all messages all queues for which the sender address is _alice@gmail.com_ or _bob@gmail.com_, and print the queue
-IDs to _postsuper_ which places the matching messages on hold.
+Find all messages all queues for which the sender address is _alice@gmail.com_ or _bob@gmail.com_, and pipe the queue
+IDs to _postsuper_ in order to place the matching messages on hold.
 
 ```bash
 postqueue -j | postqf -s '^(alice|bob)@gmail\.com$' -i | postsuper -h -
@@ -71,15 +71,13 @@ optional arguments:
 
 ## Installation
 
-PostQF is distributed via [PyPI.org](https://test.pypi.org/project/postqf/) and can be installed using the following
-commands:
+PostQF is distributed via [PyPI.org](https://pypi.org/project/postqf/) and can be installed using _pip_.
 
 ```bash
-# Minimal installation
 pip install postqf
 ```
 
-The only requirement is Python 3.7 or newer. No additional packages will be installed.
+The only requirement is Python 3.7 or newer. No additional dependencies need to be installed.
 
 ```bash
 # Advanced installation using a Python virtual environment
@@ -91,8 +89,8 @@ pip install -U pip postqf
 ```
 
 The _pip_ installation process adds a launcher executable `postqf`, either site-wide or in the Python virtual
-environment. In the latter case, the launcher will be placed in `.venv/bin`, and this directory is added to your PATH
-variable when you activate the venv environment as shown above.
+environment. In the latter case, the launcher will be placed into the directory `.venv/bin` which is automatically added
+to your PATH variable when you activate the venv environment as shown above.
 
 ## Contact
 
