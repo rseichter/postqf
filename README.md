@@ -11,8 +11,8 @@ specifically tailored for easier access to Postfix queues.
 
 To facilitate the use of Unix-like [pipelines](https://en.wikipedia.org/wiki/Pipeline_%28Unix%29), PostQF usually reads
 from _stdin_ and writes to _stdout_. Using command line arguments, you can override this behaviour and define one or
-more input files and/or an output Depending on the context, a horizontal dash `-` represents either _stdin_ or _stdout_.
-See the command line usage description below.
+more input files and/or an output file. Depending on the context, a horizontal dash `-` represents either _stdin_ or
+_stdout_. See the command line usage description below.
 
 ## Filters
 
@@ -71,21 +71,25 @@ optional arguments:
 
 ## Installation
 
-PostQF is distributed via [PyPI.org](https://pypi.org/project/postqf/) and can be installed using _pip_.
+The only installation requirement is Python 3.7 or newer. PostQF is distributed via
+[PyPI.org](https://pypi.org/project/postqf/) and can usually be installed using _pip_. If this fails, or if both Python
+2.x and 3.x are installed on your machine, use _pip3_ instead.
+
+If possible, use the recommended installation with a Python virtual environment. Site-wide installation usually requires
+root privileges.
 
 ```bash
-pip install postqf
-```
-
-The only requirement is Python 3.7 or newer. No additional dependencies need to be installed.
-
-```bash
-# Advanced installation using a Python virtual environment
+# Recommended: Installation using a Python virtual environment.
 mkdir ~/postqf
 cd ~/postqf
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -U pip postqf
+```
+
+```bash
+# Alternative: Site-wide installation, requires root access.
+sudo pip install postqf
 ```
 
 The _pip_ installation process adds a launcher executable `postqf`, either site-wide or in the Python virtual
