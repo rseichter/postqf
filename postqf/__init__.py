@@ -15,4 +15,4 @@ You should have received a copy of the GNU General Public License along with Pos
 If not, see <https://www.gnu.org/licenses/>.
 """
 PROGRAM = 'postqf'
-VERSION = '0.1.dev0222126'
+VERSION = '0.1.dev0222247'
