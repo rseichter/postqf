@@ -1,22 +1,23 @@
 # vim:ts=4:sw=4:noet
 
-COVDIR	?= ../local/coverage
-COVOPT	?= --rcfile=../pyproject.toml
-COVXML	?= .coverage.xml
-ENV		?= env PYTHONPATH=.. LOG_LEVEL=FATAL
+COVERAGE	?= env PYTHONPATH=.. LOG_LEVEL=FATAL coverage
+COVOPT		?= --rcfile=../pyproject.toml
+COVXML		?= .coverage.xml
+HTMLDIR		?= ../local/coverage
 
-.PHONY:	coverage coverage-ci coverage-html run-tests
+.PHONY:	coverage coverage-xml coverage-html run-tests
 
 coverage:
-	$(ENV) coverage run $(COVOPT) --include='../postqf/*' -m unittest discover
+	$(COVERAGE) run $(COVOPT) --include='../postqf/*' -m unittest discover
 	coverage report
 
-coverage-ci:	coverage
-	coverage xml $(COVOPT) -o $(COVXML)
+coverage-xml:	coverage
+	$(COVERAGE) xml $(COVOPT) -o $(COVXML)
 
 coverage-html:	coverage
-	coverage html -d $(COVDIR) --title='PostQF test coverage' --skip-empty --no-skip-covered
-	open $(COVDIR)/index.html
+	[ -d $(HTMLDIR) ] || mkdir -p $(HTMLDIR)
+	$(COVXML) html -d $(HTMLDIR) --title='PostQF test coverage' --skip-empty --no-skip-covered
+	open $(HTMLDIR)/index.html
 
 run-tests:
-	$(ENV) python -m unittest discover -v
+	$(COVERAGE) python -m unittest discover -v
