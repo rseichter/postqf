@@ -18,6 +18,9 @@ import re
 import sys
 from argparse import ArgumentParser
 from argparse import Namespace
+from collections import namedtuple
+from datetime import datetime
+from datetime import timedelta
 from logging import Logger
 from logging import StreamHandler
 from logging import getLogger
@@ -25,15 +28,18 @@ from re import Pattern
 from typing import List
 from typing import Optional
 
-from postqf import PROGRAM
-from postqf import VERSION
+Cutoff = namedtuple('Cutoff', ['before', 'threshold'])
 
 args: Namespace
+cutoff: Cutoff
 log: Logger
 qname_re: Pattern
 rcpt_re: Pattern
 reason_re: Pattern
 sender_re: Pattern
+
+PROGRAM = 'postqf'
+VERSION = '0.1.dev230108'
 
 
 def create_logger(log_level: int) -> Logger:
@@ -100,6 +106,20 @@ def rcpt_match(recipients: List[dict]) -> bool:
     return address_match and reason_match
 
 
+def arrival_match(epoch_time: int) -> bool:
+    """Return True if the specified time matches the filter.
+
+    Args:
+        epoch_time: Message arrival time in seconds since the Unix epoch.
+    """
+    arrived = datetime.fromtimestamp(epoch_time)
+    if cutoff.before:
+        b = (arrived < cutoff.threshold)
+    else:
+        b = (arrived > cutoff.threshold)
+    return b
+
+
 def format_output(data: dict):
     """Return either the full input data or only the queue_id element,
     depending on command line arguments.
@@ -135,7 +155,8 @@ def process_record(qdata: dict, outfile) -> None:
     name = queue_name(qdata)
     if not (str_match(qname_re, name) and
             str_match(sender_re, qdata['sender']) and
-            rcpt_match(qdata['recipients'])):
+            rcpt_match(qdata['recipients']) and
+            arrival_match(qdata['arrival_time'])):
         return
     print(format_output(qdata), file=outfile)
 
@@ -158,11 +179,12 @@ def process_files() -> None:
 def parse_args() -> Namespace:
     """Parse command line arguments."""
     p = ArgumentParser(prog=PROGRAM, epilog=f'{PROGRAM} {VERSION} Copyright © 2022 Ralph Seichter')
+    p.add_argument('-a', dest='cutoff', metavar='DELTA', nargs='?', default='+0s', help=f'Arrival time filter')
     p.add_argument('-d', dest='reason', metavar='REGEX', nargs='?', default='.', help=f'Delay reason filter')
     p.add_argument('-q', dest='qname', metavar='REGEX', nargs='?', default='.', help=f'Queue name filter')
-    p.add_argument('-r', dest='recipient', metavar='REGEX', nargs='?', default='.', help=f'Recipient address filter')
+    p.add_argument('-r', dest='rcpt', metavar='REGEX', nargs='?', default='.', help=f'Recipient address filter')
     p.add_argument('-s', dest='sender', metavar='REGEX', nargs='?', default='.', help=f'Sender address filter')
-    p.add_argument('-i', dest='queue_id', action='store_true', help=f'Output only raw queue IDs')
+    p.add_argument('-i', dest='queue_id', action='store_true', help=f'ID output only')
     p.add_argument('-l', dest='level', metavar='LEVEL', nargs='?', default='WARNING',
                    help=f'Log level (default: WARNING)')
     p.add_argument('-o', dest='outfile', metavar='PATH', nargs='?', default='-',
@@ -172,15 +194,36 @@ def parse_args() -> Namespace:
     return p.parse_args()
 
 
+def parse_cutoff(delta: str) -> Cutoff:
+    unit_seconds = {
+        # Map human-readable time unit string to seconds
+        's': 1,
+        'm': 60,
+        'h': 60 * 60,
+        'd': 60 * 60 * 24,
+    }
+    pattern = r'^([><])(\d+)([dhms])$'
+    m = re.search(pattern, delta, re.IGNORECASE)
+    if not m:
+        raise ValueError(f'Time filter {delta} does not match {pattern}')
+    before = (m.group(1) == '>')
+    seconds = int(m.group(2)) * unit_seconds[m.group(3).lower()]
+    t = datetime.utcnow() - timedelta(seconds=seconds)
+    c = Cutoff(before=before, threshold=t)
+    log.debug(f'Arrival time threshold {c.threshold}')
+    return c
+
+
 def main():
-    global args, log, qname_re, rcpt_re, reason_re, sender_re
+    global args, cutoff, log, qname_re, rcpt_re, reason_re, sender_re
     args = parse_args()
     level = getattr(logging, args.level.upper(), None)
     if not isinstance(level, int):
         raise ValueError(f'Invalid log level "{args.level}" (use DEBUG, INFO, WARNING, ERROR or CRITICAL)')
     log = create_logger(level)
     qname_re = re.compile(args.qname, re.IGNORECASE)
-    rcpt_re = re.compile(args.recipient, re.IGNORECASE)
+    rcpt_re = re.compile(args.rcpt, re.IGNORECASE)
     reason_re = re.compile(args.reason, re.IGNORECASE)
     sender_re = re.compile(args.sender, re.IGNORECASE)
+    cutoff = parse_cutoff(args.cutoff)
     process_files()

@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License along with PostQF.
 # If not, see <https://www.gnu.org/licenses/>.
-from postqf.postqf import main
+from postqf.core import main
 
 if __name__ == '__main__':
     main()
