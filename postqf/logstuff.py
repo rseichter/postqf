@@ -26,19 +26,19 @@ from postqf import VERSION
 PROG_VER = f'{PROGRAM} {VERSION}'
 
 
-def _level(log_level: str) -> int:
+def level_from_str(log_level: str) -> int:
     i = getattr(logging, log_level.upper(), None)
     if isinstance(i, int):
         return i
     raise ValueError(f'Invalid log level "{log_level}" (use DEBUG, INFO, WARNING, ERROR or CRITICAL)')
 
 
-def _logger() -> Logger:
+def create_logger() -> Logger:
     """Create a Logger object."""
     key = 'LOG_LEVEL'
     if key in os.environ:
-        level = _level(os.environ.get(key))
-    else:
+        level = level_from_str(os.environ.get(key))
+    else:  # pragma: no cover (unittests set LOG_LEVEL env)
         level = ERROR
     logger = getLogger(PROG_VER)
     handler = StreamHandler()
@@ -49,4 +49,4 @@ def _logger() -> Logger:
     return logger
 
 
-log = _logger()
+log = create_logger()
