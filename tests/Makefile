@@ -6,7 +6,7 @@ COVDIR	?= ../local/coverage
 .PHONY:	coverage coverage-html run-tests
 
 coverage:
-	$(ENV) coverage run --include='../postqf/*' -m unittest discover
+	$(ENV) coverage run --rcfile=../pyproject.toml --include='../postqf/*' -m unittest discover
 	coverage report
 
 coverage-html:	coverage
