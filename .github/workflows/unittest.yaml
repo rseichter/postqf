@@ -3,7 +3,7 @@
 name: Python code tests
 on: [push]
 jobs:
-  unittest:
+  python-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -18,3 +18,9 @@ jobs:
       - name: Run tests with coverage
         run: |
           make -C tests coverage
+      - name: Code coverage summary
+        uses: irongut/CodeCoverageSummary@v1.2.0
+        with:
+          filename: tests/.coverage
+          format: markdown
+          output: both
