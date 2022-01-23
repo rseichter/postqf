@@ -14,18 +14,18 @@
 # If not, see <https://www.gnu.org/licenses/>.
 from datetime import datetime
 from datetime import timedelta
-from unittest import TestCase
 
 from postqf import config
 from postqf.config import Cutoff
 from postqf.filter import arrival_match
+from tests import PostqfTestCase
 
 now_dt = datetime.utcnow()
 now_epoch = int(now_dt.timestamp())
 delta = timedelta(seconds=10)
 
 
-class Test(TestCase):
+class Test(PostqfTestCase):
     def test_always_true(self):
         config.cf.cutoff = Cutoff(before=True, threshold=now_dt, always_true=True)
         self.assertTrue(arrival_match(-1))
