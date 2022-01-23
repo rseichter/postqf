@@ -15,28 +15,6 @@ from _stdin_ and writes to _stdout_. Using command line arguments, you can overr
 more input files and/or an output file. Depending on the context, a horizontal dash `-` represents either _stdin_ or
 _stdout_. See the command line usage description below.
 
-## Filters
-
-Queue entries can be easily filtered by
-
-* Arrival time
-* Delay reason
-* Queue name
-* Recipient address
-* Sender address
-
-and combinations thereof, using
-[regular expressions](https://docs.python.org/3/library/re.html#regular-expression-syntax). Anchoring is optional,
-meaning that plain text is treated as a substring pattern.
-
-The arrival time filter does not use regular expressions, but instead a human-readable representation of a time
-difference. The format is **≷ W unit**, without spaces. **W** is a "whole number" (i.e. an integer >= 0). The
-prefix **>** means "before" and **<** means "after". The **unit** is a single letter among _s, m, h, d_ (seconds,
-minutes, hours, days).
-
-`>3d` and `<90m` are both examples of valid filters. Arrival filters are relative to the time PostQF is run. The
-examples are expressions for "arrived more than 3 days ago" and "arrived less than 90 minutes ago", respectively.
-
 ## Example usage
 
 Find all messages in the _deferred_ queue where the delay reason contains the string _connection timed out_.
@@ -62,28 +40,64 @@ postqueue -j | postqf -s '^(alice|bob)@gmail\.com$' -i | postsuper -h -
 Print the number of messages which arrived during the last 30 minutes.
 
 ```bash
-postqueue -j | postqf -a '<30m' | wc -l
+postqueue -j | postqf -a 30m | wc -l
 ```
+
+The final example assumes a directory `/tmp/data` with several files, each containing JSON output produced at some
+previous time. The command pipes all queue IDs which have ever been in the _hold_ queue into the file _idlist_, relying
+on BASH wildcard expansion to generate a list of input files.
+
+```bash
+postqf -i -q hold /tmp/data/*.json > idlist
+```
+
+## Filters
+
+Queue entries can be easily filtered by
+
+* Arrival time
+* Delay reason
+* Queue name
+* Recipient address
+* Sender address
+
+and combinations thereof, using
+[regular expressions](https://docs.python.org/3/library/re.html#regular-expression-syntax). Anchoring is optional,
+meaning that plain text is treated as a substring pattern.
+
+The arrival time filters do not use regular expressions, but instead a human-readable representation of a time
+difference. The format is **W unit**, without spaces. **W** is a "whole number" (i.e. an number ≥ 0). The **unit** is a
+single letter among _s, m, h, d_ (seconds, minutes, hours, days).
+
+`-b 3d` and `-a 90m` are both examples of valid command line arguments. Note that arrival filters are interpreted
+relative to the time PostQF is run. The two examples signify "message arrived more than 3 days ago" (before timestamp)
+and "message arrived less than 90 minutes ago" (after timestamp), respectively.
 
 ## Command line usage
 
 ```
-postqf [-h] [-a [DELTA]] [-d [REGEX]] [-q [REGEX]] [-r [REGEX]]
-       [-s [REGEX]] [-i] [-l [LEVEL]] [-o [PATH]] [PATH [PATH ...]]
+postqf [-h] [-i] [-d [REGEX]] [-q [REGEX]] [-r [REGEX]] [-s [REGEX]]
+       [-a [TS] | -b [TS]] [-o [PATH]] [PATH [PATH ...]]
 
 positional arguments:
   PATH        Input file. Use a dash "-" for standard input.
 
 optional arguments:
   -h, --help  show this help message and exit
-  -a [DELTA]  Arrival time filter
+  -i          ID output only
+  -o [PATH]   Output file. Use a dash "-" for standard output.
+
+Regular expression filters:
   -d [REGEX]  Delay reason filter
   -q [REGEX]  Queue name filter
   -r [REGEX]  Recipient address filter
   -s [REGEX]  Sender address filter
-  -i          ID output only
-  -l [LEVEL]  Log level (default: WARNING)
-  -o [PATH]   Output file. Use a dash "-" for standard output.
+
+Arrival time filters (mutually exclusive):
+  -a [TS]     Message arrived after TS
+  -b [TS]     Message arrived before TS
+
+postqf 0.1.dev232041 Copyright © 2022 Ralph Seichter
 ```
 
 ## Installation
