@@ -3,7 +3,7 @@
 PYPI_REPO	?= testpypi
 VENV		= $(shell realpath .venv)
 
-.PHONY:		clean dist prep pypi-upload setver usage
+.PHONY:		clean dist prep push pypi-upload setver usage
 
 usage:
 	@echo >&2 "Usage: make {clean | dist | pypi-upload}"
@@ -16,6 +16,9 @@ dist:
 
 prep:
 	@which pip | grep -q '^$(VENV)/bin/pip' || (echo 'Please execute:\n\n  source $(VENV)/bin/activate\n'; exit 1)
+
+push:
+	@for r in $(shell git remote); do git push $$r; done
 
 pypi-upload:	prep
 	twine upload --sign --identity 6AE2A84723D56D985B340BC08E5FA4709F69E911 --repository $(PYPI_REPO) dist/*
