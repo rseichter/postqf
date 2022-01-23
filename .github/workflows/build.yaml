@@ -22,12 +22,17 @@ jobs:
       - name: Run tests with coverage
         run: make -C tests coverage-xml
 
-#     - name: Code coverage summary
-#       uses: irongut/CodeCoverageSummary@v1.2.0
-#       with:
-#         filename: tests/.coverage.xml
-#         format: markdown
-#         output: both
-
-      - name: Build distribution archives
+      - name: Build distribution
         run: make dist
+
+      - name: Upload source code
+        uses: actions/upload-artifact@v2
+        with:
+          name: postqf-source
+          path: dist/*.gz
+
+      - name: Upload wheel package
+        uses: actions/upload-artifact@v2
+        with:
+          name: postqf-wheel
+          path: dist/*.whl
