@@ -19,10 +19,11 @@ from re import Pattern
 
 class Cutoff:
     """Representation of a 'cutoff' datetime."""
+    always_true: bool
     before: bool
     threshold: datetime
 
-    def __init__(self, before: bool, threshold: datetime) -> None:
+    def __init__(self, before: bool, threshold: datetime, always_true=False) -> None:
         """Initialise object.
 
         Args:
@@ -30,6 +31,7 @@ class Cutoff:
             threshold: The cutoff threshold.
         """
         super().__init__()
+        self.always_true = always_true
         self.before = before
         self.threshold = threshold
 

@@ -109,42 +109,49 @@ def process_files() -> None:
     close_file(outfile)
 
 
-def parse_cutoff(delta: str) -> Cutoff:
-    unit_seconds = {
+def parse_cutoff(delta: str, before: bool) -> Cutoff:
+    """Parse the after/before command line argument."""
+    unit_to_seconds = {
         # Map human-readable time unit string to seconds
         's': 1,
         'm': 60,
         'h': 60 * 60,
         'd': 60 * 60 * 24,
     }
-    pattern = r'^([><])(\d+)([dhms])$'
-    m = re.search(pattern, delta, re.IGNORECASE)
-    if not m:
-        raise ValueError(f'Time filter {delta} does not match {pattern}')
-    before = (m.group(1) == '>')
-    seconds = int(m.group(2)) * unit_seconds[m.group(3).lower()]
-    t = datetime.utcnow() - timedelta(seconds=seconds)
-    cutoff = Cutoff(before=before, threshold=t)
-    log.debug(f'Arrival time threshold {cutoff.threshold}')
+    if delta is None:
+        seconds = 0
+        log.debug('No time filter specified')
+    else:
+        pattern = r'^(\d+)([dhms])$'
+        match = re.search(pattern, delta, re.IGNORECASE)
+        if not match:
+            raise ValueError(f'Time filter {delta} does not match {pattern}')
+        seconds = int(match.group(1)) * unit_to_seconds[match.group(2).lower()]
+    threshold = datetime.utcnow() - timedelta(seconds=seconds)
+    log.debug(f'Arrival time threshold {threshold}')
+    cutoff = Cutoff(before=before, threshold=threshold, always_true=(delta is None))
     return cutoff
 
 
 def parse_args() -> Namespace:
     """Parse command line arguments."""
-    p = ArgumentParser(prog=PROGRAM, epilog=f'{PROG_VER} Copyright © 2022 Ralph Seichter')
-    p.add_argument('-a', dest='cutoff', metavar='DELTA', nargs='?', default='>0s', help=f'Arrival time filter')
-    p.add_argument('-d', dest='reason', metavar='REGEX', nargs='?', default='.', help=f'Delay reason filter')
-    p.add_argument('-q', dest='qname', metavar='REGEX', nargs='?', default='.', help=f'Queue name filter')
-    p.add_argument('-r', dest='rcpt', metavar='REGEX', nargs='?', default='.', help=f'Recipient address filter')
-    p.add_argument('-s', dest='sender', metavar='REGEX', nargs='?', default='.', help=f'Sender address filter')
-    p.add_argument('-i', dest='queue_id', action='store_true', help=f'ID output only')
-    p.add_argument('-l', dest='level', metavar='LEVEL', nargs='?', default='WARNING',
-                   help=f'Log level (default: WARNING)')
-    p.add_argument('-o', dest='outfile', metavar='PATH', nargs='?', default='-',
-                   help='Output file. Use a dash "-" for standard output.')
-    p.add_argument('infile', metavar='PATH', nargs='*', default='-',
-                   help='Input file. Use a dash "-" for standard input.')
-    return p.parse_args()
+    parser = ArgumentParser(prog=PROGRAM, epilog=f'{PROG_VER} Copyright © 2022 Ralph Seichter')
+    parser.add_argument('-i', dest='queue_id', action='store_true', help=f'ID output only')
+    parser.add_argument('-l', dest='level', metavar='LEVEL', nargs='?', default='WARNING',
+                        help=f'Log level (default: WARNING)')
+    group = parser.add_argument_group('Regular expression filters')
+    group.add_argument('-d', dest='reason', metavar='REGEX', nargs='?', default='.', help=f'Delay reason filter')
+    group.add_argument('-q', dest='qname', metavar='REGEX', nargs='?', default='.', help=f'Queue name filter')
+    group.add_argument('-r', dest='rcpt', metavar='REGEX', nargs='?', default='.', help=f'Recipient address filter')
+    group.add_argument('-s', dest='sender', metavar='REGEX', nargs='?', default='.', help=f'Sender address filter')
+    group = parser.add_argument_group('Arrival time filters').add_mutually_exclusive_group()
+    group.add_argument('-a', dest='after', metavar='TS', nargs='?', help=f'Message arrived after TS')
+    group.add_argument('-b', dest='before', metavar='TS', nargs='?', help=f'Message arrived before TS')
+    parser.add_argument('-o', dest='outfile', metavar='PATH', nargs='?', default='-',
+                        help='Output file. Use a dash "-" for standard output.')
+    parser.add_argument('infile', metavar='PATH', nargs='*', default='-',
+                        help='Input file. Use a dash "-" for standard input.')
+    return parser.parse_args()
 
 
 def main() -> None:
@@ -154,5 +161,8 @@ def main() -> None:
     cf.rcpt_re = re.compile(cf.args.rcpt, re.IGNORECASE)
     cf.reason_re = re.compile(cf.args.reason, re.IGNORECASE)
     cf.sender_re = re.compile(cf.args.sender, re.IGNORECASE)
-    cf.cutoff = parse_cutoff(cf.args.cutoff)
+    if cf.args.before:
+        cf.cutoff = parse_cutoff(cf.args.before, True)
+    else:
+        cf.cutoff = parse_cutoff(cf.args.after, False)
     process_files()

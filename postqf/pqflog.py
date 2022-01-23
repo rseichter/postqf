@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License along with PostQF.
 # If not, see <https://www.gnu.org/licenses/>.
 import logging
-from logging import ERROR
 from logging import Formatter
+from logging import INFO
 from logging import Logger
 from logging import StreamHandler
 from logging import getLogger
@@ -30,7 +30,7 @@ def _create_logger() -> Logger:
     logger = getLogger(PROG_VER)
     handler = StreamHandler()
     handler.setFormatter(Formatter('%(asctime)s %(levelname)s %(message)s'))
-    log_level = ERROR
+    log_level = INFO
     handler.setLevel(log_level)
     logger.addHandler(handler)
     logger.setLevel(log_level)
