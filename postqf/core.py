@@ -13,44 +13,23 @@
 # You should have received a copy of the GNU General Public License along with PostQF.
 # If not, see <https://www.gnu.org/licenses/>.
 import json
-import logging
 import re
 import sys
 from argparse import ArgumentParser
 from argparse import Namespace
-from collections import namedtuple
 from datetime import datetime
 from datetime import timedelta
-from logging import Logger
-from logging import StreamHandler
-from logging import getLogger
-from re import Pattern
-from typing import List
 from typing import Optional
 
-Cutoff = namedtuple('Cutoff', ['before', 'threshold'])
-
-args: Namespace
-cutoff: Cutoff
-log: Logger
-qname_re: Pattern
-rcpt_re: Pattern
-reason_re: Pattern
-sender_re: Pattern
-
-PROGRAM = 'postqf'
-VERSION = '0.1.dev230108'
-
-
-def create_logger(log_level: int) -> Logger:
-    """Create a Logger object with the given log level."""
-    logger = getLogger(__name__)
-    handler = StreamHandler()
-    handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
-    handler.setLevel(log_level)
-    logger.addHandler(handler)
-    logger.setLevel(log_level)
-    return logger
+from postqf.filter import arrival_match
+from postqf.filter import rcpt_match
+from postqf.filter import str_match
+from postqf.pqflog import PROGRAM
+from postqf.pqflog import PROG_VER
+from postqf.pqflog import log
+from postqf.pqflog import set_log_level
+from postqf.shared import Cutoff
+from postqf.shared import cf
 
 
 def close_file(file):
@@ -74,52 +53,6 @@ def open_file(path: str, mode: str, dash_file):
     return open(path, mode=mode, encoding='utf-8')
 
 
-def str_match(regex: Pattern, candidate: str) -> bool:
-    """Return True if the candidate matches the regular expression.
-
-    Args:
-        regex: Pre-compiled regular expression.
-        candidate: String to match against the RE.
-    """
-    if candidate and regex.search(candidate):
-        return True
-    log.debug(f'"{candidate}" does not match "{regex.pattern}"')
-    return False
-
-
-def rcpt_match(recipients: List[dict]) -> bool:
-    """Return True if one of the recipients matches both address and delay reason.
-
-    Args:
-        recipients: List of Postfix recipient data.
-    """
-    address_match, reason_match = False, False
-    for rcpt in recipients:
-        if not rcpt_re.search(rcpt['address']):
-            log.debug(f'No match for {rcpt_re.pattern}')
-            continue
-        address_match = True
-        if 'delay_reason' in rcpt and reason_re.search(rcpt['delay_reason']):
-            reason_match = True
-            break
-        log.debug(f'No match for {reason_re.pattern}')
-    return address_match and reason_match
-
-
-def arrival_match(epoch_time: int) -> bool:
-    """Return True if the specified time matches the filter.
-
-    Args:
-        epoch_time: Message arrival time in seconds since the Unix epoch.
-    """
-    arrived = datetime.fromtimestamp(epoch_time)
-    if cutoff.before:
-        b = (arrived < cutoff.threshold)
-    else:
-        b = (arrived > cutoff.threshold)
-    return b
-
-
 def format_output(data: dict):
     """Return either the full input data or only the queue_id element,
     depending on command line arguments.
@@ -127,7 +60,7 @@ def format_output(data: dict):
     Args:
         data: Postfix recipient data.
     """
-    if args.queue_id:
+    if cf.args.queue_id:
         return data['queue_id']
     return data
 
@@ -153,8 +86,8 @@ def process_record(qdata: dict, outfile) -> None:
         outfile: Output file handle.
     """
     name = queue_name(qdata)
-    if not (str_match(qname_re, name) and
-            str_match(sender_re, qdata['sender']) and
+    if not (str_match(cf.qname_re, name) and
+            str_match(cf.sender_re, qdata['sender']) and
             rcpt_match(qdata['recipients']) and
             arrival_match(qdata['arrival_time'])):
         return
@@ -163,8 +96,8 @@ def process_record(qdata: dict, outfile) -> None:
 
 def process_files() -> None:
     """Process all given input files in order."""
-    outfile = open_file(args.outfile, 'wt', sys.stdout)
-    for path in args.infile:
+    outfile = open_file(cf.args.outfile, 'wt', sys.stdout)
+    for path in cf.args.infile:
         infile = open_file(path, 'rt', sys.stdin)
         try:
             for line in infile:
@@ -178,8 +111,8 @@ def process_files() -> None:
 
 def parse_args() -> Namespace:
     """Parse command line arguments."""
-    p = ArgumentParser(prog=PROGRAM, epilog=f'{PROGRAM} {VERSION} Copyright © 2022 Ralph Seichter')
-    p.add_argument('-a', dest='cutoff', metavar='DELTA', nargs='?', default='+0s', help=f'Arrival time filter')
+    p = ArgumentParser(prog=PROGRAM, epilog=f'{PROG_VER} Copyright © 2022 Ralph Seichter')
+    p.add_argument('-a', dest='cutoff', metavar='DELTA', nargs='?', default='>0s', help=f'Arrival time filter')
     p.add_argument('-d', dest='reason', metavar='REGEX', nargs='?', default='.', help=f'Delay reason filter')
     p.add_argument('-q', dest='qname', metavar='REGEX', nargs='?', default='.', help=f'Queue name filter')
     p.add_argument('-r', dest='rcpt', metavar='REGEX', nargs='?', default='.', help=f'Recipient address filter')
@@ -209,21 +142,17 @@ def parse_cutoff(delta: str) -> Cutoff:
     before = (m.group(1) == '>')
     seconds = int(m.group(2)) * unit_seconds[m.group(3).lower()]
     t = datetime.utcnow() - timedelta(seconds=seconds)
-    c = Cutoff(before=before, threshold=t)
-    log.debug(f'Arrival time threshold {c.threshold}')
-    return c
+    cutoff = Cutoff(before=before, threshold=t)
+    log.debug(f'Arrival time threshold {cutoff.threshold}')
+    return cutoff
 
 
-def main():
-    global args, cutoff, log, qname_re, rcpt_re, reason_re, sender_re
-    args = parse_args()
-    level = getattr(logging, args.level.upper(), None)
-    if not isinstance(level, int):
-        raise ValueError(f'Invalid log level "{args.level}" (use DEBUG, INFO, WARNING, ERROR or CRITICAL)')
-    log = create_logger(level)
-    qname_re = re.compile(args.qname, re.IGNORECASE)
-    rcpt_re = re.compile(args.rcpt, re.IGNORECASE)
-    reason_re = re.compile(args.reason, re.IGNORECASE)
-    sender_re = re.compile(args.sender, re.IGNORECASE)
-    cutoff = parse_cutoff(args.cutoff)
+def main() -> None:
+    cf.args = parse_args()
+    set_log_level(cf.args.level)
+    cf.qname_re = re.compile(cf.args.qname, re.IGNORECASE)
+    cf.rcpt_re = re.compile(cf.args.rcpt, re.IGNORECASE)
+    cf.reason_re = re.compile(cf.args.reason, re.IGNORECASE)
+    cf.sender_re = re.compile(cf.args.sender, re.IGNORECASE)
+    cf.cutoff = parse_cutoff(cf.args.cutoff)
     process_files()
