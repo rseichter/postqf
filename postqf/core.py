@@ -21,6 +21,8 @@ from datetime import datetime
 from datetime import timedelta
 from typing import Optional
 
+from postqf.config import Cutoff
+from postqf.config import cf
 from postqf.filter import arrival_match
 from postqf.filter import rcpt_match
 from postqf.filter import str_match
@@ -28,8 +30,6 @@ from postqf.pqflog import PROGRAM
 from postqf.pqflog import PROG_VER
 from postqf.pqflog import log
 from postqf.pqflog import set_log_level
-from postqf.shared import Cutoff
-from postqf.shared import cf
 
 
 def close_file(file):

@@ -12,22 +12,30 @@
 #
 # You should have received a copy of the GNU General Public License along with PostQF.
 # If not, see <https://www.gnu.org/licenses/>.
-import datetime
 from argparse import Namespace
+from datetime import datetime
 from re import Pattern
 
 
 class Cutoff:
+    """Representation of a 'cutoff' datetime."""
     before: bool
-    threshold: datetime.datetime
+    threshold: datetime
 
-    def __init__(self, before, threshold) -> None:
+    def __init__(self, before: bool, threshold: datetime) -> None:
+        """Initialise object.
+
+        Args:
+            before: True signals "before threshold", False means "after threshold".
+            threshold: The cutoff threshold.
+        """
         super().__init__()
         self.before = before
         self.threshold = threshold
 
 
 class Config:
+    """PostQF configuration elements."""
     args: Namespace
     cutoff: Cutoff
     qname_re: Pattern
@@ -36,4 +44,5 @@ class Config:
     sender_re: Pattern
 
 
+# Shared configuration object
 cf = Config()

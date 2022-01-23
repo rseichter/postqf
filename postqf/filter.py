@@ -16,8 +16,8 @@ from datetime import datetime
 from typing import List
 from typing import Pattern
 
+from postqf.config import cf
 from postqf.pqflog import log
-from postqf.shared import cf
 
 
 def str_match(regex: Pattern, candidate: str) -> bool:
