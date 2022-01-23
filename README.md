@@ -97,7 +97,7 @@ Arrival time filters (mutually exclusive):
   -a [TS]     Message arrived after TS
   -b [TS]     Message arrived before TS
 
-postqf 0.1.dev232041 Copyright © 2022 Ralph Seichter
+postqf 0.1 Copyright © 2022 Ralph Seichter
 ```
 
 ## Installation
