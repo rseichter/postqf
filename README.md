@@ -130,5 +130,7 @@ to your PATH variable when you activate the venv environment as shown above.
 ## Contact
 
 The project is hosted on GitHub in the [rseichter/postqf](https://github.com/rseichter/postqf) repository. If you have
-suggestions or run into any problems, please use the [issue tracker](https://github.com/rseichter/postqf/issues). The
+suggestions or run into any problems, please check the
+[discussions](https://github.com/rseichter/postqf/discussions) section first. There is also an
+[issue](https://github.com/rseichter/postqf/issues) tracker available, and the
 [build configuration](https://github.com/rseichter/postqf/blob/master/setup.cfg) file contains a contact email address.
