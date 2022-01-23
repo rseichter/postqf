@@ -25,5 +25,5 @@ VQ	= '$(V)'
 SED	= sed -i"" -E -e "s/(^version =).*/\1
 
 setver:
-	$(SED) $(VQ)/i" postqf/__init__.py
+	$(SED) $(VQ)/i" postqf/core.py
 	$(SED) $(V)/i" setup.cfg
