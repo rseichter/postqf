@@ -27,8 +27,8 @@ from postqf.config import cf
 from postqf.filter import arrival_match
 from postqf.filter import rcpt_match
 from postqf.filter import str_match
-from postqf.pqflog import PROG_VER
-from postqf.pqflog import log
+from postqf.logstuff import PROG_VER
+from postqf.logstuff import log
 
 
 def close_file(file):
