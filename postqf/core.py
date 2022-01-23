@@ -29,7 +29,6 @@ from postqf.filter import rcpt_match
 from postqf.filter import str_match
 from postqf.pqflog import PROG_VER
 from postqf.pqflog import log
-from postqf.pqflog import set_log_level
 
 
 def close_file(file):
@@ -137,14 +136,12 @@ def parse_args() -> Namespace:
     """Parse command line arguments."""
     parser = ArgumentParser(prog=PROGRAM, epilog=f'{PROG_VER} Copyright © 2022 Ralph Seichter')
     parser.add_argument('-i', dest='queue_id', action='store_true', help=f'ID output only')
-    parser.add_argument('-l', dest='level', metavar='LEVEL', nargs='?', default='WARNING',
-                        help=f'Log level (default: WARNING)')
     group = parser.add_argument_group('Regular expression filters')
     group.add_argument('-d', dest='reason', metavar='REGEX', nargs='?', default='.', help=f'Delay reason filter')
     group.add_argument('-q', dest='qname', metavar='REGEX', nargs='?', default='.', help=f'Queue name filter')
     group.add_argument('-r', dest='rcpt', metavar='REGEX', nargs='?', default='.', help=f'Recipient address filter')
     group.add_argument('-s', dest='sender', metavar='REGEX', nargs='?', default='.', help=f'Sender address filter')
-    group = parser.add_argument_group('Arrival time filters').add_mutually_exclusive_group()
+    group = parser.add_argument_group('Arrival time filters (mutually exclusive)').add_mutually_exclusive_group()
     group.add_argument('-a', dest='after', metavar='TS', nargs='?', help=f'Message arrived after TS')
     group.add_argument('-b', dest='before', metavar='TS', nargs='?', help=f'Message arrived before TS')
     parser.add_argument('-o', dest='outfile', metavar='PATH', nargs='?', default='-',
@@ -156,7 +153,6 @@ def parse_args() -> Namespace:
 
 def main() -> None:
     cf.args = parse_args()
-    set_log_level(cf.args.level)
     cf.qname_re = re.compile(cf.args.qname, re.IGNORECASE)
     cf.rcpt_re = re.compile(cf.args.rcpt, re.IGNORECASE)
     cf.reason_re = re.compile(cf.args.reason, re.IGNORECASE)

@@ -13,8 +13,9 @@
 # You should have received a copy of the GNU General Public License along with PostQF.
 # If not, see <https://www.gnu.org/licenses/>.
 import logging
+import os
+from logging import ERROR
 from logging import Formatter
-from logging import INFO
 from logging import Logger
 from logging import StreamHandler
 from logging import getLogger
@@ -25,23 +26,27 @@ from postqf import VERSION
 PROG_VER = f'{PROGRAM} {VERSION}'
 
 
-def _create_logger() -> Logger:
+def _level(log_level: str) -> int:
+    i = getattr(logging, log_level.upper(), None)
+    if isinstance(i, int):
+        return i
+    raise ValueError(f'Invalid log level "{log_level}" (use DEBUG, INFO, WARNING, ERROR or CRITICAL)')
+
+
+def _logger() -> Logger:
     """Create a Logger object."""
+    key = 'LOG_LEVEL'
+    if key in os.environ:
+        level = _level(os.environ.get(key))
+    else:
+        level = ERROR
     logger = getLogger(PROG_VER)
     handler = StreamHandler()
     handler.setFormatter(Formatter('%(asctime)s %(levelname)s %(message)s'))
-    log_level = INFO
-    handler.setLevel(log_level)
+    handler.setLevel(level)
     logger.addHandler(handler)
-    logger.setLevel(log_level)
+    logger.setLevel(level)
     return logger
 
 
-def set_log_level(s: str) -> None:
-    level = getattr(logging, s.upper(), None)
-    if not isinstance(level, int):
-        raise ValueError(f'Invalid log level "{s}" (use DEBUG, INFO, WARNING, ERROR or CRITICAL)')
-    log.setLevel(level)
-
-
-log = _create_logger()
+log = _logger()
