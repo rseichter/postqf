@@ -66,7 +66,7 @@ and combinations thereof, using
 meaning that plain text is treated as a substring pattern.
 
 The arrival time filters do not use regular expressions, but instead a human-readable representation of a time
-difference. The format is **W unit**, without spaces. **W** is a "whole number" (i.e. an number ≥ 0). The **unit** is a
+difference. The format is **W unit**, without spaces. **W** is a "whole number" (i.e. a number ≥ 0). The **unit** is a
 single letter among _s, m, h, d_ (seconds, minutes, hours, days).
 
 `-b 3d` and `-a 90m` are both examples of valid command line arguments. Note that arrival filters are interpreted
@@ -96,8 +96,6 @@ Regular expression filters:
 Arrival time filters (mutually exclusive):
   -a [TS]     Message arrived after TS
   -b [TS]     Message arrived before TS
-
-postqf 0.1 Copyright © 2022 Ralph Seichter
 ```
 
 ## Installation
