@@ -31,7 +31,7 @@ meaning that plain text is treated as a substring pattern.
 
 The arrival time filter does not use regular expressions, but instead a human-readable representation of a time
 difference. The format is **≷ W unit**, without spaces. **W** is a "whole number" (i.e. an integer >= 0). The
-prefix **<** means "before" and **>** means "after". The **unit** is a single letter among _s, m, h, d_ (seconds,
+prefix **>** means "before" and **<** means "after". The **unit** is a single letter among _s, m, h, d_ (seconds,
 minutes, hours, days).
 
 `>7d` and `<90m` are both examples for valid filters, and time filters are applied relative to the time PostQF is run.
