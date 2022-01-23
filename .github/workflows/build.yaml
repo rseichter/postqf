@@ -1,6 +1,6 @@
 # vim:ft=yaml:ts=2:sw=2:et
 
-name: Python buld and code tests
+name: Python build and code tests
 on: [push]
 
 jobs:
