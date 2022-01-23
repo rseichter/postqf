@@ -59,6 +59,12 @@ IDs to _postsuper_ in order to place the matching messages on hold.
 postqueue -j | postqf -s '^(alice|bob)@gmail\.com$' -i | postsuper -h -
 ```
 
+Print the number of messages which arrived during the last 30 minutes.
+
+```bash
+postqueue -j | postqf -a '<30m' | wc -l
+```
+
 ## Command line usage
 
 ```
