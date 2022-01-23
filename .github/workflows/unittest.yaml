@@ -1,10 +1,10 @@
 # vim:ft=yaml:ts=2:sw=2:et
 
-name: Python code tests
+name: Python buld and code tests
 on: [push]
 
 jobs:
-  python-tests:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -20,8 +20,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run tests with coverage
-        run: |
-          make -C tests coverage-xml
+        run: make -C tests coverage-xml
 
 #     - name: Code coverage summary
 #       uses: irongut/CodeCoverageSummary@v1.2.0
@@ -29,3 +28,6 @@ jobs:
 #         filename: tests/.coverage.xml
 #         format: markdown
 #         output: both
+
+      - name: Build distribution archives
+        run: make dist
