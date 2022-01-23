@@ -21,6 +21,6 @@ jobs:
       - name: Code coverage summary
         uses: irongut/CodeCoverageSummary@v1.2.0
         with:
-          filename: tests/.coverage
+          filename: ./tests/.coverage
           format: markdown
           output: both
