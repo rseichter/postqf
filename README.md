@@ -34,8 +34,8 @@ difference. The format is **≷ W unit**, without spaces. **W** is a "whole numb
 prefix **>** means "before" and **<** means "after". The **unit** is a single letter among _s, m, h, d_ (seconds,
 minutes, hours, days).
 
-`>7d` and `<90m` are both examples for valid filters, and time filters are applied relative to the time PostQF is run.
-The two examples mean "more than 7 days ago" and "less than 90 minutes ago", respectively.
+`>3d` and `<90m` are both examples of valid filters. Arrival filters are relative to the time PostQF is run. The
+examples are expressions for "arrived more than 3 days ago" and "arrived less than 90 minutes ago", respectively.
 
 ## Example usage
 
