@@ -21,12 +21,12 @@ from datetime import datetime
 from datetime import timedelta
 from typing import Optional
 
+from postqf import PROGRAM
 from postqf.config import Cutoff
 from postqf.config import cf
 from postqf.filter import arrival_match
 from postqf.filter import rcpt_match
 from postqf.filter import str_match
-from postqf.pqflog import PROGRAM
 from postqf.pqflog import PROG_VER
 from postqf.pqflog import log
 from postqf.pqflog import set_log_level
@@ -109,24 +109,6 @@ def process_files() -> None:
     close_file(outfile)
 
 
-def parse_args() -> Namespace:
-    """Parse command line arguments."""
-    p = ArgumentParser(prog=PROGRAM, epilog=f'{PROG_VER} Copyright © 2022 Ralph Seichter')
-    p.add_argument('-a', dest='cutoff', metavar='DELTA', nargs='?', default='>0s', help=f'Arrival time filter')
-    p.add_argument('-d', dest='reason', metavar='REGEX', nargs='?', default='.', help=f'Delay reason filter')
-    p.add_argument('-q', dest='qname', metavar='REGEX', nargs='?', default='.', help=f'Queue name filter')
-    p.add_argument('-r', dest='rcpt', metavar='REGEX', nargs='?', default='.', help=f'Recipient address filter')
-    p.add_argument('-s', dest='sender', metavar='REGEX', nargs='?', default='.', help=f'Sender address filter')
-    p.add_argument('-i', dest='queue_id', action='store_true', help=f'ID output only')
-    p.add_argument('-l', dest='level', metavar='LEVEL', nargs='?', default='WARNING',
-                   help=f'Log level (default: WARNING)')
-    p.add_argument('-o', dest='outfile', metavar='PATH', nargs='?', default='-',
-                   help='Output file. Use a dash "-" for standard output.')
-    p.add_argument('infile', metavar='PATH', nargs='*', default='-',
-                   help='Input file. Use a dash "-" for standard input.')
-    return p.parse_args()
-
-
 def parse_cutoff(delta: str) -> Cutoff:
     unit_seconds = {
         # Map human-readable time unit string to seconds
@@ -145,6 +127,24 @@ def parse_cutoff(delta: str) -> Cutoff:
     cutoff = Cutoff(before=before, threshold=t)
     log.debug(f'Arrival time threshold {cutoff.threshold}')
     return cutoff
+
+
+def parse_args() -> Namespace:
+    """Parse command line arguments."""
+    p = ArgumentParser(prog=PROGRAM, epilog=f'{PROG_VER} Copyright © 2022 Ralph Seichter')
+    p.add_argument('-a', dest='cutoff', metavar='DELTA', nargs='?', default='>0s', help=f'Arrival time filter')
+    p.add_argument('-d', dest='reason', metavar='REGEX', nargs='?', default='.', help=f'Delay reason filter')
+    p.add_argument('-q', dest='qname', metavar='REGEX', nargs='?', default='.', help=f'Queue name filter')
+    p.add_argument('-r', dest='rcpt', metavar='REGEX', nargs='?', default='.', help=f'Recipient address filter')
+    p.add_argument('-s', dest='sender', metavar='REGEX', nargs='?', default='.', help=f'Sender address filter')
+    p.add_argument('-i', dest='queue_id', action='store_true', help=f'ID output only')
+    p.add_argument('-l', dest='level', metavar='LEVEL', nargs='?', default='WARNING',
+                   help=f'Log level (default: WARNING)')
+    p.add_argument('-o', dest='outfile', metavar='PATH', nargs='?', default='-',
+                   help='Output file. Use a dash "-" for standard output.')
+    p.add_argument('infile', metavar='PATH', nargs='*', default='-',
+                   help='Input file. Use a dash "-" for standard input.')
+    return p.parse_args()
 
 
 def main() -> None:

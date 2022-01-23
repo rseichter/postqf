@@ -19,8 +19,9 @@ from logging import Logger
 from logging import StreamHandler
 from logging import getLogger
 
-PROGRAM = 'postqf'
-VERSION = '0.1.dev231604'
+from postqf import PROGRAM
+from postqf import VERSION
+
 PROG_VER = f'{PROGRAM} {VERSION}'
 
 
