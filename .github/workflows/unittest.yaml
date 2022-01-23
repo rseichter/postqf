@@ -2,25 +2,30 @@
 
 name: Python code tests
 on: [push]
+
 jobs:
   python-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
           python-version: 3.7
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
       - name: Run tests with coverage
         run: |
-          make -C tests coverage
-      - name: Code coverage summary
-        uses: irongut/CodeCoverageSummary@v1.2.0
-        with:
-          filename: ./tests/.coverage
-          format: markdown
-          output: both
+          make -C tests coverage-xml
+
+#     - name: Code coverage summary
+#       uses: irongut/CodeCoverageSummary@v1.2.0
+#       with:
+#         filename: tests/.coverage.xml
+#         format: markdown
+#         output: both
