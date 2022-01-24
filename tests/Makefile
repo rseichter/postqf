@@ -12,7 +12,7 @@ coverage:
 
 coverage-html:	coverage
 	[ -d $(HTMLDIR) ] || mkdir -p $(HTMLDIR)
-	$(COVXML) html -d $(HTMLDIR) --title='PostQF test coverage' --skip-empty --no-skip-covered
+	$(COVERAGE) html -d $(HTMLDIR) --title='PostQF test coverage' --skip-empty --no-skip-covered
 	open $(HTMLDIR)/index.html
 
 run-tests:
