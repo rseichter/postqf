@@ -34,22 +34,34 @@ def str_match(regex: Pattern, candidate: str) -> bool:
 
 
 def rcpt_match(recipients: List[dict]) -> bool:
-    """Return True if one of the recipients matches both address and delay reason.
+    """Return True if one of the recipients matches.
 
     Args:
         recipients: List of Postfix recipient data.
     """
-    address_match, reason_match = False, False
-    for rcpt in recipients:
-        if not cf.rcpt_re.search(rcpt['address']):
-            log.debug(f'No match for {cf.rcpt_re.pattern}')
-            continue
-        address_match = True
-        if 'delay_reason' in rcpt and cf.reason_re.search(rcpt['delay_reason']):
-            reason_match = True
-            break
-        log.debug(f'No match for {cf.reason_re.pattern}')
-    return address_match and reason_match
+    for recipient in recipients:
+        if cf.rcpt_re.search(recipient['address']):
+            return True
+    log.debug(f'No match for {cf.rcpt_re.pattern}')
+    return False
+
+
+def reason_match(recipients: List[dict]) -> bool:
+    """Return True if one of the delay reasons matches, or if there is no delay
+    reason available for any recipient and no reason filter has been specified.
+
+    Args:
+        recipients: List of Postfix recipient data.
+    """
+    for recipient in recipients:
+        if 'delay_reason' in recipient:
+            if cf.reason_re.search(recipient['delay_reason']):
+                return True
+        elif cf.reason_re.pattern == '.':
+            # Queue data contains no delay reason and no reason filter was specified.
+            return True
+    log.debug(f'No match for {cf.reason_re.pattern}')
+    return False
 
 
 def arrival_match(epoch_time: int) -> bool:

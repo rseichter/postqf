@@ -19,6 +19,7 @@ from postqf.config import Interval
 from postqf.config import cf
 from postqf.filter import arrival_match
 from postqf.filter import rcpt_match
+from postqf.filter import reason_match
 from postqf.filter import str_match
 from postqf.logstuff import level_from_str
 from tests import PostqfTestCase
@@ -63,7 +64,7 @@ class TestRcpt(PostqfTestCase):
 
     def test_reason_mismatch(self):
         self.config_re('reason_re', 'gone mad')
-        self.assertFalse(rcpt_match(self.recipients()))
+        self.assertFalse(reason_match(self.recipients()))
 
     def test_rcpt_mismatch(self):
         self.config_re('rcpt_re', r'@example\.edu')

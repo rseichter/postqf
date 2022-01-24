@@ -23,6 +23,7 @@ from postqf.config import Interval
 from postqf.config import cf
 from postqf.filter import arrival_match
 from postqf.filter import rcpt_match
+from postqf.filter import reason_match
 from postqf.filter import str_match
 from postqf.logstuff import PROG_VER
 from postqf.logstuff import log
@@ -37,7 +38,7 @@ def close_file(file):
 
 
 def open_file(path: str, mode: str, dash_file):
-    """Open a file handle.
+    """Open a file handle unless it is standard input/output.
 
     Args:
         path: File name/path or "-".
@@ -75,19 +76,19 @@ def queue_name(data: dict) -> Optional[str]:
 
 
 def process_record(qdata: dict, outfile) -> None:
-    """Process a single Postfix queue data record and write to the specified output file.
+    """Process a single Postfix queue data record and write to the given
+    output file if the record matches all user-specified filters.
 
     Args:
         qdata: Postfix queue data.
         outfile: Output file handle.
     """
-    name = queue_name(qdata)
-    if not (str_match(cf.qname_re, name) and
+    if (str_match(cf.qname_re, queue_name(qdata)) and
             str_match(cf.sender_re, qdata['sender']) and
             rcpt_match(qdata['recipients']) and
+            reason_match(qdata['recipients']) and
             arrival_match(qdata['arrival_time'])):
-        return
-    print(format_output(qdata), file=outfile)
+        print(format_output(qdata), file=outfile)
 
 
 def process_files() -> None:
@@ -114,7 +115,7 @@ def parse_args() -> Namespace:
     group.add_argument('-q', dest='qname', metavar='REGEX', nargs='?', default='.', help=f'Queue name filter')
     group.add_argument('-r', dest='rcpt', metavar='REGEX', nargs='?', default='.', help=f'Recipient address filter')
     group.add_argument('-s', dest='sender', metavar='REGEX', nargs='?', default='.', help=f'Sender address filter')
-    group = parser.add_argument_group('Arrival time filters (mutually exclusive)')
+    group = parser.add_argument_group('Arrival time filters')
     group.add_argument('-a', dest='after', metavar='TS', nargs='?', default=Interval.DEFAULT_AFTER,
                        help=f'Message arrived after TS')
     group.add_argument('-b', dest='before', metavar='TS', nargs='?', default=Interval.DEFAULT_BEFORE,
