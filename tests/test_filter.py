@@ -15,6 +15,9 @@
 import logging
 import re
 
+from postqf.config import Interval
+from postqf.config import cf
+from postqf.filter import arrival_match
 from postqf.filter import rcpt_match
 from postqf.filter import str_match
 from postqf.logstuff import level_from_str
@@ -29,6 +32,11 @@ class TestFilter(PostqfTestCase):
     def test_mismatch(self):
         pattern = re.compile(r'^ham$')
         self.assertFalse(str_match(pattern, 'eggs'))
+
+    def test_arrival_match(self):
+        cf.interval = Interval()
+        arrival_match(1)
+        self.assertTrue(arrival_match(1))
 
 
 class TestLog(PostqfTestCase):

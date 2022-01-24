@@ -13,10 +13,13 @@
 # You should have received a copy of the GNU General Public License along with PostQF.
 # If not, see <https://www.gnu.org/licenses/>.
 import uuid
+from argparse import Namespace
 from datetime import datetime
 from datetime import timedelta
+from re import Pattern
 from unittest import TestCase
 
+from postqf.config import Config
 from postqf.config import Interval
 
 
@@ -26,6 +29,27 @@ def _epoch(d: datetime) -> int:
 
 def _past(reference: datetime, delta: timedelta):
     return reference - delta
+
+
+class TestConfig(TestCase):
+    def test_refresh(self):
+        c = Config()
+        ns = Namespace(
+            after='20m',
+            before='10s',
+            interval=None,
+            qname='active',
+            rcpt=r'@example\.net$',
+            reason='reason',
+            sender=r'sarah@example\.com$',
+        )
+        c.refresh(ns)
+        self.assertEqual(ns.after, c.args.after)
+        self.assertTrue(isinstance(c.interval, Interval))
+        self.assertTrue(isinstance(c.qname_re, Pattern))
+        self.assertTrue(isinstance(c.rcpt_re, Pattern))
+        self.assertTrue(isinstance(c.reason_re, Pattern))
+        self.assertTrue(isinstance(c.sender_re, Pattern))
 
 
 class TestInterval(TestCase):

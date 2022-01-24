@@ -82,6 +82,7 @@ class Config:
         self.sender_re = None
 
     def refresh(self, ns: Namespace) -> None:
+        """Refresh config from parsed command line arguments."""
         self.args = ns
         self.interval = Interval(ns.after, ns.before)
         self.qname_re = compile(ns.qname, IGNORECASE)
