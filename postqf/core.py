@@ -109,17 +109,17 @@ def process_files() -> None:
 def parse_args() -> Namespace:
     """Parse command line arguments."""
     parser = ArgumentParser(prog=PROGRAM, epilog=f'{PROG_VER} Copyright © 2022 Ralph Seichter')
-    parser.add_argument('-i', dest='queue_id', action='store_true', help=f'ID output only')
+    parser.add_argument('-i', dest='queue_id', action='store_true', help=f'ID output only.')
     group = parser.add_argument_group('Regular expression filters')
-    group.add_argument('-d', dest='reason', metavar='REGEX', nargs='?', default='.', help=f'Delay reason filter')
-    group.add_argument('-q', dest='qname', metavar='REGEX', nargs='?', default='.', help=f'Queue name filter')
-    group.add_argument('-r', dest='rcpt', metavar='REGEX', nargs='?', default='.', help=f'Recipient address filter')
-    group.add_argument('-s', dest='sender', metavar='REGEX', nargs='?', default='.', help=f'Sender address filter')
+    group.add_argument('-d', dest='reason', metavar='REGEX', nargs='?', default='.', help=f'Delay reason filter.')
+    group.add_argument('-q', dest='qname', metavar='REGEX', nargs='?', default='.', help=f'Queue name filter.')
+    group.add_argument('-r', dest='rcpt', metavar='REGEX', nargs='?', default='.', help=f'Recipient address filter.')
+    group.add_argument('-s', dest='sender', metavar='REGEX', nargs='?', default='.', help=f'Sender address filter.')
     group = parser.add_argument_group('Arrival time filters')
     group.add_argument('-a', dest='after', metavar='TS', nargs='?', default=Interval.DEFAULT_AFTER,
-                       help=f'Message arrived after TS')
+                       help=f'Message arrived after TS.')
     group.add_argument('-b', dest='before', metavar='TS', nargs='?', default=Interval.DEFAULT_BEFORE,
-                       help=f'Message arrived before TS')
+                       help=f'Message arrived before TS.')
     parser.add_argument('-o', dest='outfile', metavar='PATH', nargs='?', default='-',
                         help='Output file. Use a dash "-" for standard output.')
     parser.add_argument('infile', metavar='PATH', nargs='*', default='-',
