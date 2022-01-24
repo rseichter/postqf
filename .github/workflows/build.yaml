@@ -1,10 +1,13 @@
 # vim:ft=yaml:ts=2:sw=2:et
 
 name: Python build and code tests
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - docs*
 
 jobs:
-  build:
+  build-project:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
