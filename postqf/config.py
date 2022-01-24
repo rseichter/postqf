@@ -51,22 +51,17 @@ class Interval:
         match = re.match(r'(\d+)([dhms])$', what, IGNORECASE)
         if match:
             # Time delta relative to "UTC now", in the past.
-            seconds = Interval.unit_seconds_map[match.group(2).lower()]
+            seconds = int(match.group(1)) * Interval.unit_seconds_map[match.group(2).lower()]
             d = datetime.now() - timedelta(seconds=seconds)
         else:
             # Attempt ISO 8601 string conversion. Exceptions are deliberately not caught.
             d = datetime.fromisoformat(what)
         return d
 
-    def _parse(self) -> None:
-        if not self.before:
-            a = self.to_datetime(self.after_str, datetime.fromtimestamp(0))
-            self.after = a
-            b = self.to_datetime(self.before_str, datetime.fromisoformat('9999-12-31'))
-            self.before = b
-
     def wraps(self, t: datetime) -> bool:
-        self._parse()
+        if not self.before:
+            self.after = self.to_datetime(self.after_str, datetime.fromtimestamp(0))
+            self.before = self.to_datetime(self.before_str, datetime.fromisoformat('9999-12-31'))
         return self.after < t < self.before
 
 
