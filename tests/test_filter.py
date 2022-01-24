@@ -62,9 +62,17 @@ class TestRcpt(PostqfTestCase):
     def test_match(self):
         self.assertTrue(rcpt_match(self.recipients()))
 
+    def test_reason_match(self):
+        self.assertTrue(reason_match(self.recipients()))
+
     def test_reason_mismatch(self):
         self.config_re('reason_re', 'gone mad')
         self.assertFalse(reason_match(self.recipients()))
+
+    def test_reason_unavailable(self):
+        r = [{'foo': 'bar'}]
+        self.config_re('reason_re', '.')
+        self.assertTrue(reason_match(r))
 
     def test_rcpt_mismatch(self):
         self.config_re('rcpt_re', r'@example\.edu')
