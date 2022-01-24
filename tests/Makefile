@@ -2,17 +2,13 @@
 
 COVERAGE	?= env PYTHONPATH=.. LOG_LEVEL=FATAL coverage
 COVOPT		?= --rcfile=../pyproject.toml
-COVXML		?= .coverage.xml
 HTMLDIR		?= ../local/coverage
 
-.PHONY:	coverage coverage-xml coverage-html run-tests
+.PHONY:	coverage coverage-html run-tests
 
 coverage:
 	$(COVERAGE) run $(COVOPT) --include='../postqf/*' -m unittest discover
 	coverage report
-
-coverage-xml:	coverage
-	$(COVERAGE) xml $(COVOPT) -o $(COVXML)
 
 coverage-html:	coverage
 	[ -d $(HTMLDIR) ] || mkdir -p $(HTMLDIR)
