@@ -16,7 +16,7 @@ from postqf.filter import rcpt_match
 from tests import PostqfTestCase
 
 
-class Test(PostqfTestCase):
+class TestRcpt(PostqfTestCase):
     def setUp(self) -> None:
         super().setUp()
         self.config_re('sender_re', r'@example\.com$')

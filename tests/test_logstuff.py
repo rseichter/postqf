@@ -18,7 +18,7 @@ from postqf.logstuff import level_from_str
 from tests import PostqfTestCase
 
 
-class Test(PostqfTestCase):
+class TestLog(PostqfTestCase):
     def test_invalid(self):
         with self.assertRaises(ValueError):
             level_from_str('invalid')

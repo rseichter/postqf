@@ -12,38 +12,82 @@
 #
 # You should have received a copy of the GNU General Public License along with PostQF.
 # If not, see <https://www.gnu.org/licenses/>.
+import re
 from argparse import Namespace
 from datetime import datetime
-from re import Pattern
+from datetime import timedelta
+from re import IGNORECASE
+from re import compile
 
 
-class Cutoff:
-    """Representation of a 'cutoff' datetime."""
-    always_true: bool
-    before: bool
-    threshold: datetime
+class Interval:
+    """Representation of a time interval between two epoch times."""
+    DEFAULT_AFTER = '1970-01-01'
+    DEFAULT_BEFORE = '9999-12-31'
+    unit_seconds_map = {
+        's': 1,
+        'm': 60,
+        'h': 60 * 60,
+        'd': 60 * 60 * 24,
+    }
 
-    def __init__(self, before: bool, threshold: datetime, always_true=False) -> None:
-        """Initialise object.
+    def __init__(self, after: str = DEFAULT_AFTER, before: str = DEFAULT_BEFORE) -> None:
+        self.after_str = after
+        self.before_str = before
+        self.after = None
+        self.before = None
+        self.reference = datetime.now()
 
-        Args:
-            before: True signals "before threshold", False means "after threshold".
-            threshold: The cutoff threshold.
-        """
-        super().__init__()
-        self.always_true = always_true
-        self.before = before
-        self.threshold = threshold
+    def __str__(self) -> str:
+        return f'({self.after}, {self.before})'
+
+    @staticmethod
+    def to_datetime(what: str, default: datetime) -> datetime:
+        if not what:
+            return default
+        elif re.match(r'\d+$', what):
+            # Digits only, epoch time.
+            return datetime.fromtimestamp(int(what))
+        match = re.match(r'(\d+)([dhms])$', what, IGNORECASE)
+        if match:
+            # Time delta relative to "UTC now", in the past.
+            seconds = Interval.unit_seconds_map[match.group(2).lower()]
+            d = datetime.now() - timedelta(seconds=seconds)
+        else:
+            # Attempt ISO 8601 string conversion. Exceptions are deliberately not caught.
+            d = datetime.fromisoformat(what)
+        return d
+
+    def _parse(self) -> None:
+        if not self.before:
+            a = self.to_datetime(self.after_str, datetime.fromtimestamp(0))
+            self.after = a
+            b = self.to_datetime(self.before_str, datetime.fromisoformat('9999-12-31'))
+            self.before = b
+
+    def wraps(self, t: datetime) -> bool:
+        self._parse()
+        return self.after < t < self.before
 
 
 class Config:
     """PostQF configuration elements."""
-    args: Namespace
-    cutoff: Cutoff
-    qname_re: Pattern
-    rcpt_re: Pattern
-    reason_re: Pattern
-    sender_re: Pattern
+
+    def __init__(self) -> None:
+        self.args = None
+        self.interval = None
+        self.qname_re = None
+        self.rcpt_re = None
+        self.reason_re = None
+        self.sender_re = None
+
+    def refresh(self, ns: Namespace) -> None:
+        self.args = ns
+        self.interval = Interval(ns.after, ns.before)
+        self.qname_re = compile(ns.qname, IGNORECASE)
+        self.rcpt_re = compile(ns.rcpt, IGNORECASE)
+        self.reason_re = compile(ns.reason, IGNORECASE)
+        self.sender_re = compile(ns.sender, IGNORECASE)
 
 
 # Shared configuration object

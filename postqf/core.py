@@ -13,16 +13,13 @@
 # You should have received a copy of the GNU General Public License along with PostQF.
 # If not, see <https://www.gnu.org/licenses/>.
 import json
-import re
 import sys
 from argparse import ArgumentParser
 from argparse import Namespace
-from datetime import datetime
-from datetime import timedelta
 from typing import Optional
 
 from postqf import PROGRAM
-from postqf.config import Cutoff
+from postqf.config import Interval
 from postqf.config import cf
 from postqf.filter import arrival_match
 from postqf.filter import rcpt_match
@@ -108,30 +105,6 @@ def process_files() -> None:
     close_file(outfile)
 
 
-def parse_cutoff(delta: str, before: bool) -> Cutoff:
-    """Parse the after/before command line argument."""
-    unit_to_seconds = {
-        # Map human-readable time unit string to seconds
-        's': 1,
-        'm': 60,
-        'h': 60 * 60,
-        'd': 60 * 60 * 24,
-    }
-    if delta is None:
-        seconds = 0
-        log.debug('No time filter specified')
-    else:
-        pattern = r'^(\d+)([dhms])$'
-        match = re.search(pattern, delta, re.IGNORECASE)
-        if not match:
-            raise ValueError(f'Time filter {delta} does not match {pattern}')
-        seconds = int(match.group(1)) * unit_to_seconds[match.group(2).lower()]
-    threshold = datetime.utcnow() - timedelta(seconds=seconds)
-    log.debug(f'Arrival time threshold {threshold}')
-    cutoff = Cutoff(before=before, threshold=threshold, always_true=(delta is None))
-    return cutoff
-
-
 def parse_args() -> Namespace:
     """Parse command line arguments."""
     parser = ArgumentParser(prog=PROGRAM, epilog=f'{PROG_VER} Copyright © 2022 Ralph Seichter')
@@ -141,9 +114,11 @@ def parse_args() -> Namespace:
     group.add_argument('-q', dest='qname', metavar='REGEX', nargs='?', default='.', help=f'Queue name filter')
     group.add_argument('-r', dest='rcpt', metavar='REGEX', nargs='?', default='.', help=f'Recipient address filter')
     group.add_argument('-s', dest='sender', metavar='REGEX', nargs='?', default='.', help=f'Sender address filter')
-    group = parser.add_argument_group('Arrival time filters (mutually exclusive)').add_mutually_exclusive_group()
-    group.add_argument('-a', dest='after', metavar='TS', nargs='?', help=f'Message arrived after TS')
-    group.add_argument('-b', dest='before', metavar='TS', nargs='?', help=f'Message arrived before TS')
+    group = parser.add_argument_group('Arrival time filters (mutually exclusive)')
+    group.add_argument('-a', dest='after', metavar='TS', nargs='?', default=Interval.DEFAULT_AFTER,
+                       help=f'Message arrived after TS')
+    group.add_argument('-b', dest='before', metavar='TS', nargs='?', default=Interval.DEFAULT_BEFORE,
+                       help=f'Message arrived before TS')
     parser.add_argument('-o', dest='outfile', metavar='PATH', nargs='?', default='-',
                         help='Output file. Use a dash "-" for standard output.')
     parser.add_argument('infile', metavar='PATH', nargs='*', default='-',
@@ -152,13 +127,5 @@ def parse_args() -> Namespace:
 
 
 def main() -> None:
-    cf.args = parse_args()
-    cf.qname_re = re.compile(cf.args.qname, re.IGNORECASE)
-    cf.rcpt_re = re.compile(cf.args.rcpt, re.IGNORECASE)
-    cf.reason_re = re.compile(cf.args.reason, re.IGNORECASE)
-    cf.sender_re = re.compile(cf.args.sender, re.IGNORECASE)
-    if cf.args.before:
-        cf.cutoff = parse_cutoff(cf.args.before, True)
-    else:
-        cf.cutoff = parse_cutoff(cf.args.after, False)
+    cf.refresh(parse_args())
     process_files()

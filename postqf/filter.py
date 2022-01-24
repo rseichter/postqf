@@ -58,11 +58,5 @@ def arrival_match(epoch_time: int) -> bool:
     Args:
         epoch_time: Message arrival time in seconds since the Unix epoch.
     """
-    if cf.cutoff.always_true:
-        return True
     arrived = datetime.fromtimestamp(epoch_time)
-    if cf.cutoff.before:
-        b = (arrived < cf.cutoff.threshold)
-    else:
-        b = (arrived > cf.cutoff.threshold)
-    return b
+    return cf.interval.wraps(arrived)

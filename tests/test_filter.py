@@ -18,7 +18,7 @@ from postqf.filter import str_match
 from tests import PostqfTestCase
 
 
-class Test(PostqfTestCase):
+class TestFilter(PostqfTestCase):
     def test_match(self):
         pattern = re.compile('.')
         self.assertTrue(str_match(pattern, 'eggs'))

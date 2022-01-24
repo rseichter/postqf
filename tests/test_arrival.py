@@ -14,28 +14,42 @@
 # If not, see <https://www.gnu.org/licenses/>.
 from datetime import datetime
 from datetime import timedelta
+from unittest import TestCase
 
-from postqf import config
-from postqf.config import Cutoff
-from postqf.filter import arrival_match
-from tests import PostqfTestCase
+from postqf.config import Interval
 
-now_dt = datetime.utcnow()
+now_dt = datetime.now()
 now_epoch = int(now_dt.timestamp())
 delta = timedelta(seconds=10)
 
 
-class Test(PostqfTestCase):
-    def test_always_true(self):
-        config.cf.cutoff = Cutoff(before=True, threshold=now_dt, always_true=True)
-        self.assertTrue(arrival_match(-1))
+def _epoch(d: datetime) -> int:
+    return int(d.timestamp())
 
-    def test_after(self):
-        past = now_dt - delta
-        config.cf.cutoff = Cutoff(before=False, threshold=past)
-        self.assertTrue(arrival_match(now_epoch))
 
-    def test_before(self):
-        past = int((now_dt - delta).timestamp())
-        config.cf.cutoff = Cutoff(before=True, threshold=now_dt)
-        self.assertTrue(arrival_match(past))
+def _past(reference: datetime, delta: timedelta):
+    return reference - delta
+
+
+class TestInterval(TestCase):
+    def test_default_interval(self):
+        t = _past(datetime.now(), timedelta(seconds=1))
+        self.assertTrue(Interval().wraps(t))
+
+    def test_both_boundaries(self):
+        t = _past(datetime.now(), timedelta(minutes=1))
+        self.assertTrue(Interval(after='2022-01-24', before='30s').wraps(t))
+
+    def test_lower_hr(self):
+        self.assertTrue(Interval(after='1s').wraps(datetime.now()))
+
+    def test_lower_iso(self):
+        self.assertTrue(Interval(after='2022-01-24').wraps(datetime.now()))
+
+    def test_upper_hr(self):
+        t = _past(datetime.now(), timedelta(seconds=2))
+        self.assertTrue(Interval(before='1s').wraps(t))
+
+    def test_upper_iso(self):
+        t = datetime.fromisoformat('2022-01-23')
+        self.assertTrue(Interval(before='2022-01-24').wraps(t))
