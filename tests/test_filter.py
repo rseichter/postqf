@@ -12,9 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License along with PostQF.
 # If not, see <https://www.gnu.org/licenses/>.
+import logging
 import re
 
+from postqf.filter import rcpt_match
 from postqf.filter import str_match
+from postqf.logstuff import level_from_str
 from tests import PostqfTestCase
 
 
@@ -26,3 +29,34 @@ class TestFilter(PostqfTestCase):
     def test_mismatch(self):
         pattern = re.compile(r'^ham$')
         self.assertFalse(str_match(pattern, 'eggs'))
+
+
+class TestLog(PostqfTestCase):
+    def test_invalid(self):
+        with self.assertRaises(ValueError):
+            level_from_str('invalid')
+
+    def test_valid(self):
+        self.assertEqual(logging.FATAL, level_from_str('FATAL'))
+
+
+class TestRcpt(PostqfTestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.config_re('sender_re', r'@example\.com$')
+        self.config_re('rcpt_re', r'@example\.net$')
+        self.config_re('reason_re', 'over quota')
+
+    def test_empty(self):
+        self.assertFalse(rcpt_match(list()))
+
+    def test_match(self):
+        self.assertTrue(rcpt_match(self.recipients()))
+
+    def test_reason_mismatch(self):
+        self.config_re('reason_re', 'gone mad')
+        self.assertFalse(rcpt_match(self.recipients()))
+
+    def test_rcpt_mismatch(self):
+        self.config_re('rcpt_re', r'@example\.edu')
+        self.assertFalse(rcpt_match(self.recipients()))

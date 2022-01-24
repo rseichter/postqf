@@ -12,15 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License along with PostQF.
 # If not, see <https://www.gnu.org/licenses/>.
+import uuid
 from datetime import datetime
 from datetime import timedelta
 from unittest import TestCase
 
 from postqf.config import Interval
-
-now_dt = datetime.now()
-now_epoch = int(now_dt.timestamp())
-delta = timedelta(seconds=10)
 
 
 def _epoch(d: datetime) -> int:
@@ -32,6 +29,18 @@ def _past(reference: datetime, delta: timedelta):
 
 
 class TestInterval(TestCase):
+    def test_str(self):
+        a = uuid.uuid1().hex
+        b = uuid.uuid1().hex
+        i = Interval()
+        i.after = a
+        i.before = b
+        self.assertEqual(f'({a}, {b})', str(i))
+
+    def test_return_default(self):
+        t = datetime.now()
+        self.assertEqual(t, Interval.to_datetime('', t))
+
     def test_default_interval(self):
         t = _past(datetime.now(), timedelta(seconds=1))
         self.assertTrue(Interval().wraps(t))
@@ -45,6 +54,11 @@ class TestInterval(TestCase):
 
     def test_lower_iso(self):
         self.assertTrue(Interval(after='2022-01-24').wraps(datetime.now()))
+
+    def test_lower_epoch(self):
+        a = int(datetime.fromisoformat('2022-01-24T18:44:59').timestamp())
+        t = datetime.fromisoformat('2022-01-24T18:45')
+        self.assertTrue(Interval(after=f'{a}').wraps(t))
 
     def test_upper_hr(self):
         t = _past(datetime.now(), timedelta(seconds=2))
