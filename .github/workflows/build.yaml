@@ -1,10 +1,7 @@
 # vim:ft=yaml:ts=2:sw=2:et
 
 name: PostQF project jobs
-on:
-  push:
-    branches:
-      - master
+on: [create, push]
 
 jobs:
   build:
@@ -36,9 +33,10 @@ jobs:
           path: dist/*
 
   publish-pypi:
-    name: Publish to PyPI
+    name: Publish
     needs: build
     runs-on: ubuntu-latest
+    if: github.event.ref_type == 'tag'
     steps:
       - name: Download Python artifacts
         uses: actions/download-artifact@v2
