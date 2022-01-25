@@ -35,7 +35,7 @@ jobs:
           path: dist/*
 
   pypi-testrepo:
-    if: github.event.ref_type == 'tag' && contains(github.ref_name, '.dev'):
+    if: github.event.ref_type == 'tag' && contains(github.ref_name, '.dev')
     name: Publish
     needs: python-build
     runs-on: ubuntu-latest
