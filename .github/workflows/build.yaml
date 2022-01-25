@@ -44,9 +44,7 @@ jobs:
         uses: actions/download-artifact@v2
 
       - name: Prepare dist directory
-        run: |
-          mv python-artifacts dist
-          ls -alR
+        run: mv python-artifacts dist
 
       - name: Publish to PyPI test repository
         uses: pypa/gh-action-pypi-publish@release/v1
