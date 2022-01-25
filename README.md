@@ -87,7 +87,7 @@ examples of valid command line arguments:
 * `-a 2022-01-23T08:30 -b 2022-01-23T17:45` January 23, 2022 between 08:30 and 17:45.
 * `-a 1642923000 -b 1642956300` The same time interval, specified in Unix time.
 * `-a 90m` Less than 90 minutes ago.
-* `-b 36h` More than 36 hours days ago.
+* `-b 36h` More than 36 hours ago.
 
 ## Command line usage
 
