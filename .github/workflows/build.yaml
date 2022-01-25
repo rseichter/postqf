@@ -3,12 +3,12 @@
 name: PostQF project jobs
 on:
   push:
-    branches-ignore:
-      - docs*
+    branches:
+      - master
 
 jobs:
   build:
-    name: Python build and code tests
+    name: Python build and tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -43,13 +43,9 @@ jobs:
       - name: Download Python artifacts
         uses: actions/download-artifact@v2
 
-      - name: Echo download path
-        run: echo ${{steps.download.outputs.download-path}}
-
       - name: Prepare dist directory
         run: |
-          mkdir dist
-          mv python-artifacts/* dist/
+          mv python-artifacts dist
           ls -alR
 
       - name: Publish to PyPI test repository
