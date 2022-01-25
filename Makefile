@@ -23,7 +23,7 @@ push:
 pypi-upload:	prep
 	twine upload --sign --identity 6AE2A84723D56D985B340BC08E5FA4709F69E911 --repository $(PYPI_REPO) dist/*
 
-V	?= $(shell echo "0.2.dev$$(date -u +'%j%H%M' | sed -e 's/^0//')")
+V	?= $(shell echo "0.3.dev$$(date -u +'%j%H%M' | sed -e 's/^0//')")
 VQ	= '$(V)'
 SED	= sed -i"" -E -e "s/(^version =).*/\1
 

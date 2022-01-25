@@ -1,13 +1,14 @@
 # vim:ft=yaml:ts=2:sw=2:et
 
-name: Python build and code tests
+name: PostQF project jobs
 on:
   push:
     branches-ignore:
       - docs*
 
 jobs:
-  build-project:
+  build:
+    name: Python build and code tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -28,14 +29,33 @@ jobs:
       - name: Build distribution
         run: make dist
 
-      - name: Upload source code
+      - name: Upload Python artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: postqf-source
-          path: dist/*.gz
+          name: python-artifacts
+          path: dist/*
 
-      - name: Upload wheel package
-        uses: actions/upload-artifact@v2
+  publish-pypi:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Python artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Echo download path
+        run: echo ${{steps.download.outputs.download-path}}
+
+      - name: Prepare dist directory
+        run: |
+          mkdir dist
+          mv python-artifacts/* dist/
+          ls -alR
+
+      - name: Publish to PyPI test repository
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          name: postqf-wheel
-          path: dist/*.whl
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN_TESTREPO }}
+          repository_url: https://test.pypi.org/legacy/
+          verbose: true

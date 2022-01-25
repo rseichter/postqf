@@ -156,3 +156,4 @@ suggestions or run into any problems, please check the
 [discussions](https://github.com/rseichter/postqf/discussions) section first. There is also an
 [issue](https://github.com/rseichter/postqf/issues) tracker available, and the
 [build configuration](https://github.com/rseichter/postqf/blob/master/setup.cfg) file contains a contact email address.
+
