@@ -23,21 +23,22 @@ jobs:
       - name: Run tests with coverage
         run: make -C tests coverage
 
-      - name: Build distribution
+      - if: github.event.ref_type == 'tag'
+        name: Build distribution
         run: make dist
 
-      - name: Upload Python artifacts
+      - if: github.event.ref_type == 'tag'
+        name: Upload Python artifacts
         uses: actions/upload-artifact@v2
-        if: github.event.ref_type == 'tag'
         with:
           name: python-artifacts
           path: dist/*
 
   publish-pypi:
+    if: github.event.ref_type == 'tag'
     name: Publish
     needs: build
     runs-on: ubuntu-latest
-    if: github.event.ref_type == 'tag'
     steps:
       - name: Download Python artifacts
         uses: actions/download-artifact@v2
