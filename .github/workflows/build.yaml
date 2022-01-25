@@ -2,11 +2,11 @@
 
 name: PostQF project workflow
 on: [create, push]
-runs-on: ubuntu-latest
 
 jobs:
   python-build:
     name: Python build and unit tests
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
@@ -37,6 +37,7 @@ jobs:
     if: github.event.ref_type == 'tag'
     name: Publish
     needs: python-build
+    runs-on: ubuntu-latest
     steps:
       - name: Download Python artifacts
         uses: actions/download-artifact@v2
