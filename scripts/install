@@ -32,7 +32,7 @@ EOT
 }
 
 if [ $# -eq 0 ]; then
-	RELEASE="0.2"
+	RELEASE='0.2'
 elif [ $# -eq 1 ]; then
 	RELEASE="${1}"
 else

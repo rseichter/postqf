@@ -1,12 +1,28 @@
 # vim:ts=4:sw=4:noet
 
 PYPI_REPO	?= testpypi
+VERSION		?= $(shell echo "0.3.dev$$(date -u +'%j%H%M' | sed -e 's/^0//')")
+
+SEDI		= sed -i'' -E -e
 VENV		= $(shell realpath .venv)
+VERSIONQ	= '$(VERSION)'
 
-.PHONY:		clean dist prep push pypi-upload setver usage
+.PHONY:		clean dist push pypi-upload release setver
 
-usage:
-	@echo >&2 "Usage: make {clean | dist | pypi-upload}"
+define usage
+
+  clean
+  dist
+  push
+  pypi-upload  PYPI_REPO=...
+  release      VERSION=...
+  setver       VERSION=...
+
+endef
+
+help:
+	@$(info $(usage))
+	@exit 1
 
 clean:	prep
 	rm -fr dist/*
@@ -23,10 +39,9 @@ push:
 pypi-upload:	prep
 	twine upload --sign --identity 6AE2A84723D56D985B340BC08E5FA4709F69E911 --repository $(PYPI_REPO) dist/*
 
-V	?= $(shell echo "0.3.dev$$(date -u +'%j%H%M' | sed -e 's/^0//')")
-VQ	= '$(V)'
-SED	= sed -i"" -E -e "s/(^version =).*/\1
+release:	setver
+	$(SEDI) "s/(RELEASE=')[0-9].+/\1$(VERSION)'/" scripts/install
 
 setver:
-	$(SED) $(VQ)/i" postqf/__init__.py
-	$(SED) $(V)/i" setup.cfg
+	$(SEDI) "s/(^VERSION =).*/\1 $(VERSIONQ)/" postqf/__init__.py
+	$(SEDI) "s/(^version =).*/\1 $(VERSION)/" setup.cfg
