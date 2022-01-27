@@ -117,45 +117,29 @@ Arrival time filters:
 ## Installation
 
 The only installation requirement is Python 3.7 or newer. PostQF is distributed via
-[PyPI.org](https://pypi.org/project/postqf/) and can usually be installed using _pip_. If this fails, or if both Python
-2.x and 3.x are installed on your machine, use _pip3_ instead.
+[PyPI.org](https://pypi.org/project/postqf/) and is typically installed using either _pip_ or _pip3_, depending on your
+Python distribution.
 
-I also provide an installer script, which will download the latest PostQF release into the current directory, and
-generate a launcher. This is the recommended installation method. A disadvantage of this method is that it will not
-verify that you have a supported Python version installed.
+I also provide an installer script as an alternative. It will download the latest PostQF release into the current
+directory, and generate an executable launcher. A small disadvantage of this method is that it will not check if you
+have a supported Python version installed.
 
 ```bash
-# Installation using the official shell script.
+# Typical: Installation using 'pip'.
+pip install postqf
+```
+
+The _pip_ installation process also adds a `postqf` launcher executable. The exact location depends on your Python
+distribution, and you might need to modify your PATH environment variable for easy access.
+
+```bash
+# Alternative: Official installation script.
 mkdir ~/postqf
 cd ~/postqf
 # Download and run the install script. If successful, it will print a message
 # similar to "You can now launch PostQF using /home/alice/postqf/postqf".
-curl -L https://github.com/rseichter/postqf/raw/master/scripts/install | bash
+curl -fL https://github.com/rseichter/postqf/raw/master/scripts/install | bash
 ```
-
-```bash
-# Alternative #1: Installation using a Python virtual environment.
-mkdir ~/postqf
-cd ~/postqf
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -U pip postqf
-# You can now execute PostQF. The following displays helpful information:
-postqf -h
-
-# After logging in afresh in the future, you need only activate the venv again:
-source ~/postqf/.venv/bin/activate
-postqf -h
-```
-
-```bash
-# Alternative #2: Site-wide installation, requires root access.
-sudo pip install postqf
-```
-
-The _pip_ installation process adds a launcher executable `postqf`, either site-wide or in the Python virtual
-environment. In the latter case, the launcher will be placed into the directory `.venv/bin` which is automatically added
-to your PATH variable when you activate the venv environment as shown above.
 
 ## Contact
 
