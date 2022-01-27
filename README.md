@@ -120,11 +120,21 @@ The only installation requirement is Python 3.7 or newer. PostQF is distributed 
 [PyPI.org](https://pypi.org/project/postqf/) and can usually be installed using _pip_. If this fails, or if both Python
 2.x and 3.x are installed on your machine, use _pip3_ instead.
 
-If possible, use the recommended installation with a Python virtual environment. Site-wide installation usually requires
-root privileges.
+I also provide an installer script, which will download the latest PostQF release into the current directory, and
+generate a launcher. This is the recommended installation method. A disadvantage of this method is that it will not
+verify that you have a supported Python version installed.
 
 ```bash
-# Recommended: Installation using a Python virtual environment.
+# Installation using the official shell script.
+mkdir ~/postqf
+cd ~/postqf
+# Download and run the install script. If successful, it will print a message
+# similar to "You can now launch PostQF using /home/alice/postqf/postqf".
+curl -L https://github.com/rseichter/postqf/raw/master/scripts/install | bash
+```
+
+```bash
+# Alternative #1: Installation using a Python virtual environment.
 mkdir ~/postqf
 cd ~/postqf
 python3 -m venv .venv
@@ -132,16 +142,14 @@ source .venv/bin/activate
 pip install -U pip postqf
 # You can now execute PostQF. The following displays helpful information:
 postqf -h
-```
 
-```bash
 # After logging in afresh in the future, you need only activate the venv again:
 source ~/postqf/.venv/bin/activate
 postqf -h
 ```
 
 ```bash
-# Alternative method: Site-wide installation, requires root access.
+# Alternative #2: Site-wide installation, requires root access.
 sudo pip install postqf
 ```
 
