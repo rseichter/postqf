@@ -5,7 +5,7 @@ on: [create, push]
 
 jobs:
   python-build:
-    name: Python build and unit tests
+    name: Build and test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -36,7 +36,7 @@ jobs:
 
   pypi-testrepo:
     if: github.event.ref_type == 'tag' && contains(github.ref_name, '.dev')
-    name: Publish
+    name: Publish to PyPI
     needs: python-build
     runs-on: ubuntu-latest
     steps:
