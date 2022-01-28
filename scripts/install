@@ -5,6 +5,7 @@
 
 set -euo pipefail
 declare -r BNAME="$(basename ${0})"
+declare -r RELEASE='0.3'
 
 function _die {
 	echo >&2 "$@"
@@ -31,11 +32,4 @@ EOT
 	echo You can now launch PostQF using $(realpath postqf)
 }
 
-if [ $# -eq 0 ]; then
-	RELEASE='0.2'
-elif [ $# -eq 1 ]; then
-	RELEASE="${1}"
-else
-	_die "Usage: ${BNAME} [release]"
-fi
 _install

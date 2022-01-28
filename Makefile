@@ -40,7 +40,7 @@ pypi-upload:	prep
 	twine upload --sign --identity 6AE2A84723D56D985B340BC08E5FA4709F69E911 --repository $(PYPI_REPO) dist/*
 
 release:	setver
-	$(SEDI) "s/(RELEASE=')[0-9].+/\1$(VERSION)'/" scripts/install
+	$(SEDI) "s/(RELEASE=).*/\1$(VERSIONQ)/" scripts/install
 
 setver:
 	$(SEDI) "s/(^VERSION =).*/\1 $(VERSIONQ)/" postqf/__init__.py
