@@ -59,7 +59,7 @@ def format_output(data: dict):
     """
     if cf.args.queue_id:
         return data['queue_id']
-    return data
+    return json.dumps(data)
 
 
 def queue_name(data: dict) -> Optional[str]:
