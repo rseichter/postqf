@@ -4,7 +4,6 @@
 # Install PostQF sources and create a launcher script.
 
 set -euo pipefail
-declare -r BNAME="$(basename ${0})"
 declare -r RELEASE='0.3'
 
 function _die {
