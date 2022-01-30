@@ -76,14 +76,20 @@ class Config:
         self.reason_re = None
         self.sender_re = None
 
+    @staticmethod
+    def re_compile(regex: str, default_regex: str = '.'):
+        if not regex:
+            regex = default_regex
+        return compile(regex, IGNORECASE)
+
     def refresh(self, ns: Namespace) -> None:
         """Refresh config from parsed command line arguments."""
         self.args = ns
         self.interval = Interval(ns.after, ns.before)
-        self.qname_re = compile(ns.qname, IGNORECASE)
-        self.rcpt_re = compile(ns.rcpt, IGNORECASE)
-        self.reason_re = compile(ns.reason, IGNORECASE)
-        self.sender_re = compile(ns.sender, IGNORECASE)
+        self.qname_re = Config.re_compile(ns.qname)
+        self.rcpt_re = Config.re_compile(ns.rcpt)
+        self.reason_re = Config.re_compile(ns.reason)
+        self.sender_re = Config.re_compile(ns.sender)
 
 
 # Shared configuration object
