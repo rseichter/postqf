@@ -92,26 +92,26 @@ examples of valid command line arguments:
 ## Command line usage
 
 ```
-postqf [-h] [-i] [-d [REGEX]] [-q [REGEX]] [-r [REGEX]] [-s [REGEX]]
-       [-a [TS]] [-b [TS]] [-o [PATH]] [PATH [PATH ...]]
+postqf [-h] [-i] [-d REGEX] [-q REGEX] [-r REGEX] [-s REGEX] [-a TS]
+       [-b TS] [-o OUTFILE] [FILE [FILE ...]]
 
-positional arguments:
-  PATH        Input file. Use a dash "-" for standard input.
+Positional arguments:
+  FILE        Input file. Use a dash "-" for standard input.
 
-optional arguments:
-  -h, --help  show this help message and exit
+Optional arguments:
+  -h, --help  Show this help message and exit.
   -i          ID output only.
-  -o [PATH]   Output file. Use a dash "-" for standard output.
+  -o OUTFILE  Output file. Use a dash "-" for standard output.
 
 Regular expression filters:
-  -d [REGEX]  Delay reason filter.
-  -q [REGEX]  Queue name filter.
-  -r [REGEX]  Recipient address filter.
-  -s [REGEX]  Sender address filter.
+  -d REGEX    Delay reason filter.
+  -q REGEX    Queue name filter.
+  -r REGEX    Recipient address filter.
+  -s REGEX    Sender address filter.
 
 Arrival time filters:
-  -a [TS]     Message arrived after TS.
-  -b [TS]     Message arrived before TS.
+  -a TS       Message arrived after TS.
+  -b TS       Message arrived before TS.
 ```
 
 ## Installation

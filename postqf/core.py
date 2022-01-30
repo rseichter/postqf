@@ -117,7 +117,8 @@ def parse_args() -> Namespace:
     group = parser.add_argument_group('Arrival time filters')
     group.add_argument('-a', dest='after', metavar='TS', help=f'Message arrived after TS.')
     group.add_argument('-b', dest='before', metavar='TS', help=f'Message arrived before TS.')
-    parser.add_argument('-o', dest='outfile', metavar='FILE', help='Output file. Use a dash "-" for standard output.')
+    parser.add_argument('-o', dest='outfile', metavar='OUTFILE',
+                        help='Output file. Use a dash "-" for standard output.')
     parser.add_argument('infile', metavar='FILE', nargs='*', help='Input file. Use a dash "-" for standard input.')
     return parser.parse_args()
 
