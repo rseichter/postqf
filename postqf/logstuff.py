@@ -20,11 +20,6 @@ from logging import Logger
 from logging import StreamHandler
 from logging import getLogger
 
-from postqf import PROGRAM
-from postqf import VERSION
-
-PROG_VER = f'{PROGRAM} {VERSION}'
-
 
 def level_from_str(log_level: str) -> int:
     i = getattr(logging, log_level.upper(), None)
@@ -40,13 +35,14 @@ def create_logger() -> Logger:
         level = level_from_str(os.environ.get(key))
     else:  # pragma: no cover (unittests set LOG_LEVEL env)
         level = ERROR
-    logger = getLogger(PROG_VER)
     handler = StreamHandler()
     handler.setFormatter(Formatter('%(asctime)s %(levelname)s %(message)s'))
     handler.setLevel(level)
+    logger = getLogger(__name__)
     logger.addHandler(handler)
     logger.setLevel(level)
     return logger
 
 
+# Shared logger object
 log = create_logger()

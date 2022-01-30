@@ -19,12 +19,12 @@ from argparse import Namespace
 from typing import Optional
 
 from postqf import PROGRAM
+from postqf import VERSION
 from postqf.config import cf
 from postqf.filter import arrival_match
 from postqf.filter import rcpt_match
 from postqf.filter import reason_match
 from postqf.filter import str_match
-from postqf.logstuff import PROG_VER
 from postqf.logstuff import log
 
 
@@ -107,7 +107,7 @@ def process_files() -> None:
 
 def parse_args() -> Namespace:
     """Parse command line arguments."""
-    parser = ArgumentParser(prog=PROGRAM, epilog=f'{PROG_VER} Copyright © 2022 Ralph Seichter')
+    parser = ArgumentParser(prog=PROGRAM, epilog=f'{PROGRAM} {VERSION} Copyright © 2022 Ralph Seichter')
     parser.add_argument('-i', dest='queue_id', action='store_true', help=f'ID output only.')
     group = parser.add_argument_group('Regular expression filters')
     group.add_argument('-d', dest='reason', metavar='REGEX', help=f'Delay reason filter.')
@@ -124,5 +124,6 @@ def parse_args() -> Namespace:
 
 
 def main() -> None:
+    """Execution starts here."""
     cf.refresh(parse_args())
     process_files()

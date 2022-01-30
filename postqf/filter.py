@@ -71,4 +71,4 @@ def arrival_match(epoch_time: int) -> bool:
         epoch_time: Message arrival time in seconds since the Unix epoch.
     """
     arrived = datetime.fromtimestamp(epoch_time)
-    return cf.interval.wraps(arrived)
+    return cf.interval.includes(arrived)

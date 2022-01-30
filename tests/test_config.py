@@ -78,27 +78,27 @@ class TestInterval(TestCase):
 
     def test_default_interval(self):
         t = _past(datetime.now(), timedelta(seconds=1))
-        self.assertTrue(Interval().wraps(t))
+        self.assertTrue(Interval().includes(t))
 
     def test_both_boundaries(self):
         t = _past(datetime.now(), timedelta(minutes=1))
-        self.assertTrue(Interval(after='2022-01-24', before='30s').wraps(t))
+        self.assertTrue(Interval(after='2022-01-24', before='30s').includes(t))
 
     def test_lower_hr(self):
-        self.assertTrue(Interval(after='1s').wraps(datetime.now()))
+        self.assertTrue(Interval(after='1s').includes(datetime.now()))
 
     def test_lower_iso(self):
-        self.assertTrue(Interval(after='2022-01-24').wraps(datetime.now()))
+        self.assertTrue(Interval(after='2022-01-24').includes(datetime.now()))
 
     def test_lower_epoch(self):
         a = int(datetime.fromisoformat('2022-01-24T18:44:59').timestamp())
         t = datetime.fromisoformat('2022-01-24T18:45')
-        self.assertTrue(Interval(after=f'{a}').wraps(t))
+        self.assertTrue(Interval(after=f'{a}').includes(t))
 
     def test_upper_hr(self):
         t = _past(datetime.now(), timedelta(seconds=2))
-        self.assertTrue(Interval(before='1s').wraps(t))
+        self.assertTrue(Interval(before='1s').includes(t))
 
     def test_upper_iso(self):
         t = datetime.fromisoformat('2022-01-23')
-        self.assertTrue(Interval(before='2022-01-24').wraps(t))
+        self.assertTrue(Interval(before='2022-01-24').includes(t))

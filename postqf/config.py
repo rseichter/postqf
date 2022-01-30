@@ -43,23 +43,25 @@ class Interval:
         return f'({self.after}, {self.before})'
 
     @staticmethod
-    def to_datetime(what: str, default: datetime) -> datetime:
-        if not what:
+    def to_datetime(string: str, default: datetime) -> datetime:
+        """Convert a string into a datetime object."""
+        if not string:
             return default
-        elif re.match(r'\d+$', what):
+        elif re.match(r'\d+$', string):
             # Digits only, epoch time.
-            return datetime.fromtimestamp(int(what))
-        match = re.match(r'(\d+)([dhms])$', what, IGNORECASE)
+            return datetime.fromtimestamp(int(string))
+        match = re.match(r'(\d+)([dhms])$', string, IGNORECASE)
         if match:
             # Time delta relative to "UTC now", in the past.
             seconds = int(match.group(1)) * Interval.unit_seconds_map[match.group(2).lower()]
             d = datetime.now() - timedelta(seconds=seconds)
         else:
             # Attempt ISO 8601 string conversion. Exceptions are deliberately not caught.
-            d = datetime.fromisoformat(what)
+            d = datetime.fromisoformat(string)
         return d
 
-    def wraps(self, t: datetime) -> bool:
+    def includes(self, t: datetime) -> bool:
+        """Return True if a datetime object is indluded in the configured interval."""
         if not self.before:
             self.after = self.to_datetime(self.after_str, datetime.fromtimestamp(0))
             self.before = self.to_datetime(self.before_str, datetime.fromisoformat('9999-12-31'))
@@ -81,12 +83,14 @@ class Config:
 
     @staticmethod
     def re_compile(regex: str, default: str = '.') -> Pattern:
+        """Compile a regex if available, '.' otherwise."""
         if not regex:
             regex = default
         return compile(regex, IGNORECASE)
 
     @staticmethod
     def get_attr(ns: Namespace, name: str, default):
+        """Return a namespace attribute if available, a default value otherwise."""
         value = getattr(ns, name, None)
         if value:
             return value
@@ -96,11 +100,13 @@ class Config:
         """Refresh config from parsed command line arguments."""
         self.infile = self.get_attr(ns, 'infile', ['-'])
         self.outfile = self.get_attr(ns, 'outfile', '-')
-        self.qname_re = Config.re_compile(ns.qname)
         self.queue_id = self.get_attr(ns, 'queue_id', False)
+
+        self.qname_re = Config.re_compile(ns.qname)
         self.rcpt_re = Config.re_compile(ns.rcpt)
         self.reason_re = Config.re_compile(ns.reason)
         self.sender_re = Config.re_compile(ns.sender)
+
         after = self.get_attr(ns, 'after', Interval.DEFAULT_AFTER)
         before = self.get_attr(ns, 'before', Interval.DEFAULT_BEFORE)
         self.interval = Interval(after, before)
