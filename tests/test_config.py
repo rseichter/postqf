@@ -32,6 +32,18 @@ def _past(reference: datetime, delta: timedelta):
 
 
 class TestConfig(TestCase):
+    def test_re_compile(self):
+        p = Config.re_compile(r'\d')
+        self.assertEqual(r'\d', p.pattern)
+
+    def test_re_compile_default(self):
+        p = Config.re_compile('', r'\S+')
+        self.assertEqual(r'\S+', p.pattern)
+
+    def test_re_compile_no_default(self):
+        p = Config.re_compile('')
+        self.assertEqual('.', p.pattern)
+
     def test_refresh(self):
         c = Config()
         ns = Namespace(
