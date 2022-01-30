@@ -17,6 +17,7 @@ from argparse import Namespace
 from datetime import datetime
 from datetime import timedelta
 from re import IGNORECASE
+from re import Pattern
 from re import compile
 
 
@@ -69,27 +70,40 @@ class Config:
     """PostQF configuration elements."""
 
     def __init__(self) -> None:
-        self.args = None
+        self.infile = None
         self.interval = None
+        self.outfile = None
         self.qname_re = None
+        self.queue_id = None
         self.rcpt_re = None
         self.reason_re = None
         self.sender_re = None
 
     @staticmethod
-    def re_compile(regex: str, default_regex: str = '.'):
+    def re_compile(regex: str, default: str = '.') -> Pattern:
         if not regex:
-            regex = default_regex
+            regex = default
         return compile(regex, IGNORECASE)
+
+    @staticmethod
+    def get_attr(ns: Namespace, name: str, default):
+        value = getattr(ns, name, None)
+        if value:
+            return value
+        return default
 
     def refresh(self, ns: Namespace) -> None:
         """Refresh config from parsed command line arguments."""
-        self.args = ns
-        self.interval = Interval(ns.after, ns.before)
+        self.infile = self.get_attr(ns, 'infile', ['-'])
+        self.outfile = self.get_attr(ns, 'outfile', '-')
         self.qname_re = Config.re_compile(ns.qname)
+        self.queue_id = self.get_attr(ns, 'queue_id', False)
         self.rcpt_re = Config.re_compile(ns.rcpt)
         self.reason_re = Config.re_compile(ns.reason)
         self.sender_re = Config.re_compile(ns.sender)
+        after = self.get_attr(ns, 'after', Interval.DEFAULT_AFTER)
+        before = self.get_attr(ns, 'before', Interval.DEFAULT_BEFORE)
+        self.interval = Interval(after, before)
 
 
 # Shared configuration object

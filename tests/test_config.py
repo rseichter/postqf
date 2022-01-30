@@ -44,7 +44,6 @@ class TestConfig(TestCase):
             sender=r'sarah@example\.com$',
         )
         c.refresh(ns)
-        self.assertEqual(ns.after, c.args.after)
         self.assertTrue(isinstance(c.interval, Interval))
         self.assertTrue(isinstance(c.qname_re, Pattern))
         self.assertTrue(isinstance(c.rcpt_re, Pattern))

@@ -19,7 +19,6 @@ from argparse import Namespace
 from typing import Optional
 
 from postqf import PROGRAM
-from postqf.config import Interval
 from postqf.config import cf
 from postqf.filter import arrival_match
 from postqf.filter import rcpt_match
@@ -57,7 +56,7 @@ def format_output(data: dict):
     Args:
         data: Postfix recipient data.
     """
-    if cf.args.queue_id:
+    if cf.queue_id:
         return data['queue_id']
     return json.dumps(data)
 
@@ -93,8 +92,8 @@ def process_record(qdata: dict, outfile) -> None:
 
 def process_files() -> None:
     """Process all given input files in order."""
-    outfile = open_file(cf.args.outfile, 'wt', sys.stdout)
-    for path in cf.args.infile:
+    outfile = open_file(cf.outfile, 'wt', sys.stdout)
+    for path in cf.infile:
         infile = open_file(path, 'rt', sys.stdin)
         try:
             for line in infile:
@@ -116,14 +115,10 @@ def parse_args() -> Namespace:
     group.add_argument('-r', dest='rcpt', metavar='REGEX', help=f'Recipient address filter.')
     group.add_argument('-s', dest='sender', metavar='REGEX', help=f'Sender address filter.')
     group = parser.add_argument_group('Arrival time filters')
-    group.add_argument('-a', dest='after', metavar='TS', nargs='?', default=Interval.DEFAULT_AFTER,
-                       help=f'Message arrived after TS.')
-    group.add_argument('-b', dest='before', metavar='TS', nargs='?', default=Interval.DEFAULT_BEFORE,
-                       help=f'Message arrived before TS.')
-    parser.add_argument('-o', dest='outfile', metavar='PATH', nargs='?', default='-',
-                        help='Output file. Use a dash "-" for standard output.')
-    parser.add_argument('infile', metavar='PATH', nargs='*', default='-',
-                        help='Input file. Use a dash "-" for standard input.')
+    group.add_argument('-a', dest='after', metavar='TS', help=f'Message arrived after TS.')
+    group.add_argument('-b', dest='before', metavar='TS', help=f'Message arrived before TS.')
+    parser.add_argument('-o', dest='outfile', metavar='FILE', help='Output file. Use a dash "-" for standard output.')
+    parser.add_argument('infile', metavar='FILE', nargs='*', help='Input file. Use a dash "-" for standard input.')
     return parser.parse_args()
 
 
