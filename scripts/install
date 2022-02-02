@@ -4,7 +4,7 @@
 # Install PostQF sources and create a launcher script.
 
 set -euo pipefail
-declare -r RELEASE='0.3'
+declare -r RELEASE='0.4'
 
 function _die {
 	echo >&2 "$@"
