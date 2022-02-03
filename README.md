@@ -27,7 +27,7 @@ Find all messages in the _active_ or _hold_ queues which have at least one recip
 _example.org_ domains, and write the matching JSON records into the file _/tmp/output_.
 
 ```bash
-postqueue -j | postqf -q 'active|hold' -r '@example\.(com|org)' -o /tmp/output
+postqueue -j | postqf -q 'active|hold' -r '@example\.(com|org)$' -o /tmp/output
 ```
 
 Find all messages all queues for which the sender address is _alice@gmail.com_ or _bob@gmail.com_, and pipe the queue
@@ -73,7 +73,7 @@ Arrival time filters do not use regular expressions, but support the following f
 2. [Unix time](https://en.wikipedia.org/wiki/Unix_time) (the number of seconds since January 1, 1970). This is the
    representation of arrival time returned in JSON-format Postfix queue data.
 3. Time difference, expressed as one or more digits followed by a single "unit" character _s, m, h,_ or _d_. These units
-   designate seconds, minutes, hours and or days. The resulting timestamp will be in the past, as in "now minus the
+   designate seconds, minutes, hours and days. The resulting timestamp will be in the past, as in "now minus the
    difference".
 
 Please keep in mind that formats 1 and 2 are used for fixed timestamps, while format 3 represents time differences
