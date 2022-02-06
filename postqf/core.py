@@ -189,13 +189,13 @@ def parse_args() -> Namespace:  # pragma: no cover
     parser.add_argument('-o', dest='outfile', metavar='OUTFILE',
                         help='Output file. Use a dash "-" for standard output.')
     parser.add_argument('infile', metavar='FILE', nargs='*', help='Input file. Use a dash "-" for standard input.')
-    group = parser.add_argument_group('Reports and custom output').add_mutually_exclusive_group()
+    group = parser.add_argument_group('Custom output (mutually exclusive)').add_mutually_exclusive_group()
     group.add_argument('--id', '-i', dest='queue_id', action='store_true', help='ID output only.')
-    group.add_argument('--rcpt', dest='report_rcpt', action='store_true', help='Report recipient addresses.')
-    group.add_argument('--rdom', dest='report_rdom', action='store_true', help='Report recipient domains.')
-    group.add_argument('--reason', dest='report_reason', action='store_true', help='Report delay reasons.')
-    group.add_argument('--sdom', dest='report_sdom', action='store_true', help='Report sender domains.')
-    group.add_argument('--sender', dest='report_sender', action='store_true', help='Report sender addresses.')
+    group.add_argument('--rcpt', dest='report_rcpt', action='store_true', help='Recipient address report.')
+    group.add_argument('--rdom', dest='report_rdom', action='store_true', help='Recipient domain report.')
+    group.add_argument('--reason', dest='report_reason', action='store_true', help='Delay reason report.')
+    group.add_argument('--sdom', dest='report_sdom', action='store_true', help='Sender domain report.')
+    group.add_argument('--sender', dest='report_sender', action='store_true', help='Sender address report.')
     return parser.parse_args()
 
 

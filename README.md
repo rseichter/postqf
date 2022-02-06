@@ -43,12 +43,18 @@ Print the number of messages which arrived during the last 30 minutes.
 postqueue -j | postqf -a 30m | wc -l
 ```
 
-The final example assumes a directory `/tmp/data` with several files, each containing JSON output produced at some
+The next example assumes a directory `/tmp/data` with several files, each containing JSON output produced at some
 previous time. The command pipes all queue IDs which have ever been in the _hold_ queue into the file _idlist_, relying
 on BASH wildcard expansion to generate a list of input files.
 
 ```bash
 postqf -i -q hold /tmp/data/*.json > idlist
+```
+
+Count unique recipient address domains for deferred messages and print a sorted list:
+
+```bash
+postqueue -j | postqf -q deferred --rdom
 ```
 
 ## Filters
@@ -89,16 +95,34 @@ examples of valid command line arguments:
 * `-a 90m` Less than 90 minutes ago.
 * `-b 36h` More than 36 hours ago.
 
+## Reports and custom output
+
+Besides filtering JSON input and producing JSON output in the process, PostQF can also generate a number of simple
+reports to answer some of the most frequently asked questions about message queue content. Criteria for the reports are
+as follows:
+
+* Delay reason
+* Recipient address
+* Recipient domain
+* Sender address
+* Sender domain
+
+Another type of custom output is a list of raw message IDs associated with the filter criteria. Use the `--id`
+command line argument to output the ID list.
+
+Please note that only one type of report or custom output can be generated at a time, and that the necessary command
+line options are therefore mutually exclusive.
+
 ## Command line usage
 
 ```
 postqf [-h] [-d REGEX] [-q REGEX] [-r REGEX] [-s REGEX] [-a TS] [-b TS] [-o OUTFILE]
        [--id | --rcpt | --rdom | --reason | --sdom | --sender] [FILE [FILE ...]]
 
-positional arguments:
+Positional arguments:
   FILE        Input file. Use a dash "-" for standard input.
 
-optional arguments:
+Optional arguments:
   -h, --help  show this help message and exit
   -o OUTFILE  Output file. Use a dash "-" for standard output.
 
@@ -112,13 +136,13 @@ Arrival time filters:
   -a TS       Message arrived after TS.
   -b TS       Message arrived before TS.
 
-Reports and custom output:
+Custom output (mutually exclusive):
   --id, -i    ID output only.
-  --rcpt      Report recipient addresses.
-  --rdom      Report recipient domains.
-  --reason    Report delay reasons.
-  --sdom      Report sender domains.
-  --sender    Report sender addresses.
+  --rcpt      Recipient address report.
+  --rdom      Recipient domain report.
+  --reason    Delay reason report.
+  --sdom      Sender domain report.
+  --sender    Sender address report.
 ```
 
 ## Installation
