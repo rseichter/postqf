@@ -27,6 +27,8 @@ from postqf.filter import reason_match
 from postqf.filter import str_match
 from postqf.logstuff import log
 
+report_dict = {}
+
 
 def close_file(file):
     """Close file handle unless it is standard input/output."""
@@ -74,6 +76,42 @@ def queue_name(data: dict) -> Optional[str]:
     log.error(f'Malformed input data: element "{name}" is missing')
 
 
+def count_rcpt(recipients: dict, attribute: str, separator: str = '') -> None:
+    """Count recipient attribute data for a report.
+
+    Args:
+        recipients: Dictionary of recipient data.
+        attribute: The attribute to count.
+        separator: If specified, split attribute values at the given substring and pick the second element.
+        This is useful for extracting domain names from address-type attributes.
+    """
+    global report_dict
+    for recipient in recipients:
+        if attribute not in recipient:
+            continue
+        v: str = recipient[attribute]
+        if v and separator:
+            v = v.split(separator)[1]
+        if not v:
+            continue
+        if v in report_dict:
+            report_dict[v] += 1
+        else:
+            report_dict[v] = 1
+
+
+def generate_report(data: dict, outfile, reverse: bool = False) -> None:
+    """Generate report and write it to the given output file.
+
+    Args:
+        data: Report data dictionary.
+        outfile: Output file handle.
+        reverse: Sort data in reverse order?
+    """
+    for i in sorted(data.items(), key=lambda _item: _item[1], reverse=reverse):
+        print(i[1], i[0], file=outfile)
+
+
 def process_record(qdata: dict, outfile) -> None:
     """Process a single Postfix queue data record and write to the given
     output file if the record matches all user-specified filters.
@@ -87,7 +125,14 @@ def process_record(qdata: dict, outfile) -> None:
             rcpt_match(qdata['recipients']) and
             reason_match(qdata['recipients']) and
             arrival_match(qdata['arrival_time'])):
-        print(format_output(qdata), file=outfile)
+        if cf.report_rdom:
+            count_rcpt(qdata['recipients'], 'address', separator='@')
+        elif cf.report_rcpt:
+            count_rcpt(qdata['recipients'], 'address')
+        elif cf.report_reason:
+            count_rcpt(qdata['recipients'], 'delay_reason')
+        else:
+            print(format_output(qdata), file=outfile)
 
 
 def process_files() -> None:
@@ -102,24 +147,31 @@ def process_files() -> None:
             log.exception(e)
         finally:
             close_file(infile)
+    global report_dict
+    if report_dict:
+        generate_report(report_dict, outfile)
     close_file(outfile)
 
 
 def parse_args() -> Namespace:
     """Parse command line arguments."""
     parser = ArgumentParser(prog=PROGRAM, epilog=f'{PROGRAM} {VERSION} Copyright © 2022 Ralph Seichter')
-    parser.add_argument('-i', dest='queue_id', action='store_true', help=f'ID output only.')
+    parser.add_argument('-i', dest='queue_id', action='store_true', help='ID output only.')
     group = parser.add_argument_group('Regular expression filters')
-    group.add_argument('-d', dest='reason', metavar='REGEX', help=f'Delay reason filter.')
-    group.add_argument('-q', dest='qname', metavar='REGEX', help=f'Queue name filter.')
-    group.add_argument('-r', dest='rcpt', metavar='REGEX', help=f'Recipient address filter.')
-    group.add_argument('-s', dest='sender', metavar='REGEX', help=f'Sender address filter.')
+    group.add_argument('-d', dest='reason', metavar='REGEX', help='Delay reason filter.')
+    group.add_argument('-q', dest='qname', metavar='REGEX', help='Queue name filter.')
+    group.add_argument('-r', dest='rcpt', metavar='REGEX', help='Recipient address filter.')
+    group.add_argument('-s', dest='sender', metavar='REGEX', help='Sender address filter.')
     group = parser.add_argument_group('Arrival time filters')
-    group.add_argument('-a', dest='after', metavar='TS', help=f'Message arrived after TS.')
-    group.add_argument('-b', dest='before', metavar='TS', help=f'Message arrived before TS.')
+    group.add_argument('-a', dest='after', metavar='TS', help='Message arrived after TS.')
+    group.add_argument('-b', dest='before', metavar='TS', help='Message arrived before TS.')
     parser.add_argument('-o', dest='outfile', metavar='OUTFILE',
                         help='Output file. Use a dash "-" for standard output.')
     parser.add_argument('infile', metavar='FILE', nargs='*', help='Input file. Use a dash "-" for standard input.')
+    group = parser.add_argument_group('Report generators').add_mutually_exclusive_group()
+    group.add_argument('--report-rcpt', dest='report_rcpt', action='store_true', help='Report recipient addresses.')
+    group.add_argument('--report-rdom', dest='report_rdom', action='store_true', help='Report recipient domains.')
+    group.add_argument('--report-reason', dest='report_reason', action='store_true', help='Report delay reasons.')
     return parser.parse_args()
 
 

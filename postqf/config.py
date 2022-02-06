@@ -79,6 +79,9 @@ class Config:
         self.queue_id = None
         self.rcpt_re = None
         self.reason_re = None
+        self.report_rcpt = False
+        self.report_rdom = False
+        self.report_reason = False
         self.sender_re = None
 
     @staticmethod
@@ -101,6 +104,9 @@ class Config:
         self.infile = self.get_attr(ns, 'infile', ['-'])
         self.outfile = self.get_attr(ns, 'outfile', '-')
         self.queue_id = self.get_attr(ns, 'queue_id', False)
+        self.report_rcpt = self.get_attr(ns, 'report_rcpt', False)
+        self.report_rdom = self.get_attr(ns, 'report_rdom', False)
+        self.report_reason = self.get_attr(ns, 'report_reason', False)
 
         self.qname_re = Config.re_compile(ns.qname)
         self.rcpt_re = Config.re_compile(ns.rcpt)
