@@ -18,7 +18,6 @@ import tempfile
 from argparse import Namespace
 from os.path import join
 from tempfile import NamedTemporaryFile
-from unittest import TestCase
 
 from postqf.config import cf
 from postqf.core import close_file
@@ -29,12 +28,14 @@ from postqf.core import open_file
 from postqf.core import process_files
 from postqf.core import queue_name
 from postqf.core import report_dict
+from tests import PostqfTestCase
 
 
-class Test(TestCase):
+class Test(PostqfTestCase):
     def setUp(self) -> None:
         super().setUp()
         cf.refresh(Namespace(qname=None, rcpt=None, sender=None, reason=None))
+        self.qdata = join(self.parentdir(__file__), 'qdata')
 
     def test_count_rcpt(self):
         rcpt = [
@@ -80,24 +81,24 @@ class Test(TestCase):
         self.assertEqual('xyz', queue_name({'queue_name': 'xyz'}))
 
     def test_process_files(self):
-        cf.infile = ['qdata']
+        cf.infile = [self.qdata]
         cf.outfile = '-'
         self.assertTrue(process_files())
 
     def test_process_and_report_rcpt(self):
-        cf.infile = ['qdata']
+        cf.infile = [self.qdata]
         cf.outfile = '-'
         cf.report_rcpt = True
         self.assertTrue(process_files())
 
     def test_process_and_report_rdom(self):
-        cf.infile = ['qdata']
+        cf.infile = [self.qdata]
         cf.outfile = '-'
         cf.report_rdom = True
         self.assertTrue(process_files())
 
     def test_process_and_report_reason(self):
-        cf.infile = ['qdata']
+        cf.infile = [self.qdata]
         cf.outfile = '-'
         cf.report_reason = True
         self.assertTrue(process_files())

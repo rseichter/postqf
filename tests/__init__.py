@@ -15,6 +15,8 @@ You should have received a copy of the GNU General Public License along with Pos
 If not, see <https://www.gnu.org/licenses/>.
 """
 import re
+from os.path import abspath
+from os.path import join
 from typing import List
 from unittest import TestCase
 
@@ -54,3 +56,7 @@ class PostqfTestCase(TestCase):
     def config_re(name: str, regex: str) -> None:
         pattern = re.compile(regex, re.IGNORECASE)
         setattr(config.cf, name, pattern)
+
+    @staticmethod
+    def parentdir(reference=__file__):
+        return abspath(join(reference, '..'))
