@@ -76,25 +76,27 @@ def queue_name(data: dict) -> Optional[str]:
     log.error(f'Malformed input data: element "{name}" is missing')
 
 
-def count_rcpt(recipients: list, attribute: str, separator: str = '') -> None:
+def count_rcpt(recipients: list, attribute: str, to_lower: bool = False, separator: str = '') -> None:
     """Collect recipient attribute data for a report.
 
     Args:
         recipients: Dictionary of recipient data.
         attribute: The attribute to count.
+        to_lower: Convert attribute value to lower case?
         separator: If specified, split attribute values at the given substring and pick the second element.
         This is useful for extracting domain names from address-type attributes.
     """
     for r in recipients:
         if attribute in r:
-            count_key(r[attribute], separator)
+            count_key(r[attribute], to_lower=to_lower, separator=separator)
 
 
-def count_key(key: str, separator: str = '') -> None:
+def count_key(key: str, to_lower: bool = False, separator: str = '') -> None:
     """Collect sender address data for a report.
 
     Args:
         key: Message sender address.
+        to_lower: Convert key to lower case?
         separator: If specified, split attribute values at the given substring and pick the second element.
         This is useful for extracting domain names from address-type attributes.
     """
@@ -102,6 +104,8 @@ def count_key(key: str, separator: str = '') -> None:
     if key and separator:
         key = key.split(separator)[1]
     if key:
+        if to_lower:
+            key = key.lower()
         if key in report_dict:
             report_dict[key] += 1
         else:
@@ -134,13 +138,15 @@ def process_record(qdata: dict, outfile) -> None:
             reason_match(qdata['recipients']) and
             arrival_match(qdata['arrival_time'])):
         if cf.report_rdom:
-            count_rcpt(qdata['recipients'], 'address', separator='@')
+            count_rcpt(qdata['recipients'], 'address', to_lower=True, separator='@')
         elif cf.report_rcpt:
-            count_rcpt(qdata['recipients'], 'address')
+            count_rcpt(qdata['recipients'], 'address', to_lower=True)
         elif cf.report_reason:
             count_rcpt(qdata['recipients'], 'delay_reason')
+        elif cf.report_sdom:
+            count_key(qdata['sender'], to_lower=True, separator='@')
         elif cf.report_sender:
-            count_key(qdata['sender'])
+            count_key(qdata['sender'], to_lower=True)
         else:
             print(format_output(qdata), file=outfile)
 
@@ -188,6 +194,7 @@ def parse_args() -> Namespace:  # pragma: no cover
     group.add_argument('--report-rcpt', dest='report_rcpt', action='store_true', help='Report recipient addresses.')
     group.add_argument('--report-rdom', dest='report_rdom', action='store_true', help='Report recipient domains.')
     group.add_argument('--report-reason', dest='report_reason', action='store_true', help='Report delay reasons.')
+    group.add_argument('--report-sdom', dest='report_sdom', action='store_true', help='Report sender domains.')
     group.add_argument('--report-sender', dest='report_sender', action='store_true', help='Report sender addresses.')
     return parser.parse_args()
 

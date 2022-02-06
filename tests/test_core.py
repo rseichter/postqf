@@ -97,6 +97,14 @@ class Test(PostqfTestCase):
         cf.report_reason = True
         self.assertTrue(self._process())
 
+    def test_process_and_report_sdom(self):
+        cf.report_sdom = True
+        self.assertTrue(self._process())
+
+    def test_process_and_report_sender(self):
+        cf.report_sender = True
+        self.assertTrue(self._process())
+
     def _process(self) -> bool:
         tmp = NamedTemporaryFile(delete=False)
         tmp.close()
