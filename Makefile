@@ -1,7 +1,7 @@
 # vim:ts=4:sw=4:noet
 
 PYPI_REPO	?= testpypi
-VERSION		?= $(shell echo "0.4.dev$$(date -u +'%j%H%M' | sed -e 's/^0//')")
+VERSION		?= $(shell echo "0.5.dev$$(date -u +'%j%H%M' | sed -e 's/^0//')")
 
 SEDI		= sed -i'' -E -e
 VENV		= $(shell realpath .venv)
