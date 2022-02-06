@@ -178,7 +178,6 @@ def process_files() -> bool:
 def parse_args() -> Namespace:  # pragma: no cover
     """Parse command line arguments."""
     parser = ArgumentParser(prog=PROGRAM, epilog=f'{PROGRAM} {VERSION} Copyright © 2022 Ralph Seichter')
-    parser.add_argument('-i', dest='queue_id', action='store_true', help='ID output only.')
     group = parser.add_argument_group('Regular expression filters')
     group.add_argument('-d', dest='reason', metavar='REGEX', help='Delay reason filter.')
     group.add_argument('-q', dest='qname', metavar='REGEX', help='Queue name filter.')
@@ -190,12 +189,13 @@ def parse_args() -> Namespace:  # pragma: no cover
     parser.add_argument('-o', dest='outfile', metavar='OUTFILE',
                         help='Output file. Use a dash "-" for standard output.')
     parser.add_argument('infile', metavar='FILE', nargs='*', help='Input file. Use a dash "-" for standard input.')
-    group = parser.add_argument_group('Report generators').add_mutually_exclusive_group()
-    group.add_argument('--report-rcpt', dest='report_rcpt', action='store_true', help='Report recipient addresses.')
-    group.add_argument('--report-rdom', dest='report_rdom', action='store_true', help='Report recipient domains.')
-    group.add_argument('--report-reason', dest='report_reason', action='store_true', help='Report delay reasons.')
-    group.add_argument('--report-sdom', dest='report_sdom', action='store_true', help='Report sender domains.')
-    group.add_argument('--report-sender', dest='report_sender', action='store_true', help='Report sender addresses.')
+    group = parser.add_argument_group('Reports and custom output').add_mutually_exclusive_group()
+    group.add_argument('--id', '-i', dest='queue_id', action='store_true', help='ID output only.')
+    group.add_argument('--rcpt', dest='report_rcpt', action='store_true', help='Report recipient addresses.')
+    group.add_argument('--rdom', dest='report_rdom', action='store_true', help='Report recipient domains.')
+    group.add_argument('--reason', dest='report_reason', action='store_true', help='Report delay reasons.')
+    group.add_argument('--sdom', dest='report_sdom', action='store_true', help='Report sender domains.')
+    group.add_argument('--sender', dest='report_sender', action='store_true', help='Report sender addresses.')
     return parser.parse_args()
 
 
