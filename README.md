@@ -92,15 +92,14 @@ examples of valid command line arguments:
 ## Command line usage
 
 ```
-postqf [-h] [-i] [-d REGEX] [-q REGEX] [-r REGEX] [-s REGEX] [-a TS]
-       [-b TS] [-o OUTFILE] [FILE [FILE ...]]
+postqf [-h] [-d REGEX] [-q REGEX] [-r REGEX] [-s REGEX] [-a TS] [-b TS] [-o OUTFILE]
+       [--id | --rcpt | --rdom | --reason | --sdom | --sender] [FILE [FILE ...]]
 
-Positional arguments:
+positional arguments:
   FILE        Input file. Use a dash "-" for standard input.
 
-Optional arguments:
-  -h, --help  Show this help message and exit.
-  -i          ID output only.
+optional arguments:
+  -h, --help  show this help message and exit
   -o OUTFILE  Output file. Use a dash "-" for standard output.
 
 Regular expression filters:
@@ -112,6 +111,14 @@ Regular expression filters:
 Arrival time filters:
   -a TS       Message arrived after TS.
   -b TS       Message arrived before TS.
+
+Reports and custom output:
+  --id, -i    ID output only.
+  --rcpt      Report recipient addresses.
+  --rdom      Report recipient domains.
+  --reason    Report delay reasons.
+  --sdom      Report sender domains.
+  --sender    Report sender addresses.
 ```
 
 ## Installation
