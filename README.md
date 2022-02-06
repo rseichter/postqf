@@ -95,11 +95,11 @@ examples of valid command line arguments:
 * `-a 90m` Less than 90 minutes ago.
 * `-b 36h` More than 36 hours ago.
 
-## Reports and custom output
+## Custom output
 
-Besides filtering JSON input and producing JSON output in the process, PostQF can also generate a number of simple
-reports to answer some of the most frequently asked questions about message queue content. Criteria for the reports are
-as follows:
+In addition to filtering JSON input and producing JSON output in the process, PostQF can also generate a number of
+simple reports to answer some of the most frequently asked questions about message queue content. The following data can
+be shown in reports:
 
 * Delay reason
 * Recipient address
@@ -107,11 +107,9 @@ as follows:
 * Sender address
 * Sender domain
 
-Another type of custom output is a list of raw message IDs associated with the filter criteria. Use the `--id`
-command line argument to output the ID list.
-
-Please note that only one type of report or custom output can be generated at a time, and that the necessary command
-line options are therefore mutually exclusive.
+Another type of custom output is a list of raw message IDs associated with the filter criteria. ID lists can be piped to
+utilities like [postsuper](http://www.postfix.org/postsuper.1.html). Please note that only one type of report or custom
+output can be generated at a time, and that the necessary command line options are therefore mutually exclusive.
 
 ## Command line usage
 
