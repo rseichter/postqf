@@ -1,7 +1,10 @@
 # vim:ft=yaml:ts=2:sw=2:et
 
 name: PostQF project workflow
-on: [create, push]
+on:
+  push:
+    branches:
+    - master
 
 jobs:
   python-build:
