@@ -77,7 +77,7 @@ def queue_name(data: dict) -> Optional[str]:
 
 
 def count_rcpt(recipients: list, attribute: str, separator: str = '') -> None:
-    """Count recipient attribute data for a report.
+    """Collect recipient attribute data for a report.
 
     Args:
         recipients: Dictionary of recipient data.
@@ -85,19 +85,27 @@ def count_rcpt(recipients: list, attribute: str, separator: str = '') -> None:
         separator: If specified, split attribute values at the given substring and pick the second element.
         This is useful for extracting domain names from address-type attributes.
     """
+    for r in recipients:
+        if attribute in r:
+            count_key(r[attribute], separator)
+
+
+def count_key(key: str, separator: str = '') -> None:
+    """Collect sender address data for a report.
+
+    Args:
+        key: Message sender address.
+        separator: If specified, split attribute values at the given substring and pick the second element.
+        This is useful for extracting domain names from address-type attributes.
+    """
     global report_dict
-    for recipient in recipients:
-        if attribute not in recipient:  # pragma: no cover
-            continue
-        v: str = recipient[attribute]
-        if v and separator:
-            v = v.split(separator)[1]
-        if not v:  # pragma: no cover
-            continue
-        if v in report_dict:
-            report_dict[v] += 1
+    if key and separator:
+        key = key.split(separator)[1]
+    if key:
+        if key in report_dict:
+            report_dict[key] += 1
         else:
-            report_dict[v] = 1
+            report_dict[key] = 1
 
 
 def generate_report(data: dict, outfile, reverse: bool = False) -> None:
@@ -131,6 +139,8 @@ def process_record(qdata: dict, outfile) -> None:
             count_rcpt(qdata['recipients'], 'address')
         elif cf.report_reason:
             count_rcpt(qdata['recipients'], 'delay_reason')
+        elif cf.report_sender:
+            count_key(qdata['sender'])
         else:
             print(format_output(qdata), file=outfile)
 
@@ -178,6 +188,7 @@ def parse_args() -> Namespace:  # pragma: no cover
     group.add_argument('--report-rcpt', dest='report_rcpt', action='store_true', help='Report recipient addresses.')
     group.add_argument('--report-rdom', dest='report_rdom', action='store_true', help='Report recipient domains.')
     group.add_argument('--report-reason', dest='report_reason', action='store_true', help='Report delay reasons.')
+    group.add_argument('--report-sender', dest='report_sender', action='store_true', help='Report sender addresses.')
     return parser.parse_args()
 
 

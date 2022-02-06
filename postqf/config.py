@@ -82,6 +82,7 @@ class Config:
         self.report_rcpt = False
         self.report_rdom = False
         self.report_reason = False
+        self.report_sender = False
         self.sender_re = None
 
     @staticmethod
@@ -107,6 +108,7 @@ class Config:
         self.report_rcpt = self.get_attr(ns, 'report_rcpt', False)
         self.report_rdom = self.get_attr(ns, 'report_rdom', False)
         self.report_reason = self.get_attr(ns, 'report_reason', False)
+        self.report_sender = self.get_attr(ns, 'report_sender', False)
 
         self.qname_re = Config.re_compile(ns.qname)
         self.rcpt_re = Config.re_compile(ns.rcpt)
