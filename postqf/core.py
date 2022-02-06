@@ -51,8 +51,8 @@ def open_file(path: str, mode: str, dash_file):
     return open(path, mode=mode, encoding='utf-8')
 
 
-def format_output(data: dict):
-    """Return either the full input data or only the queue_id element,
+def format_output(data: dict) -> str:
+    """Return either the full input data (JSON) or only the queue_id element,
     depending on command line arguments.
 
     Args:
@@ -76,7 +76,7 @@ def queue_name(data: dict) -> Optional[str]:
     log.error(f'Malformed input data: element "{name}" is missing')
 
 
-def count_rcpt(recipients: dict, attribute: str, separator: str = '') -> None:
+def count_rcpt(recipients: list, attribute: str, separator: str = '') -> None:
     """Count recipient attribute data for a report.
 
     Args:
@@ -87,12 +87,12 @@ def count_rcpt(recipients: dict, attribute: str, separator: str = '') -> None:
     """
     global report_dict
     for recipient in recipients:
-        if attribute not in recipient:
+        if attribute not in recipient:  # pragma: no cover
             continue
         v: str = recipient[attribute]
         if v and separator:
             v = v.split(separator)[1]
-        if not v:
+        if not v:  # pragma: no cover
             continue
         if v in report_dict:
             report_dict[v] += 1
@@ -135,25 +135,31 @@ def process_record(qdata: dict, outfile) -> None:
             print(format_output(qdata), file=outfile)
 
 
-def process_files() -> None:
-    """Process all given input files in order."""
+def process_files() -> bool:
+    """Process all given input files in order.
+
+    Returns True to indicate success, False in case of exceptions.
+    """
+    ex = None
     outfile = open_file(cf.outfile, 'wt', sys.stdout)
     for path in cf.infile:
         infile = open_file(path, 'rt', sys.stdin)
         try:
             for line in infile:
                 process_record(json.loads(line), outfile)
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             log.exception(e)
+            ex = e
         finally:
             close_file(infile)
     global report_dict
     if report_dict:
         generate_report(report_dict, outfile)
     close_file(outfile)
+    return not isinstance(ex, Exception)
 
 
-def parse_args() -> Namespace:
+def parse_args() -> Namespace:  # pragma: no cover
     """Parse command line arguments."""
     parser = ArgumentParser(prog=PROGRAM, epilog=f'{PROGRAM} {VERSION} Copyright © 2022 Ralph Seichter')
     parser.add_argument('-i', dest='queue_id', action='store_true', help='ID output only.')
@@ -175,7 +181,7 @@ def parse_args() -> Namespace:
     return parser.parse_args()
 
 
-def main() -> None:
+def main() -> None:  # pragma: no cover
     """Execution starts here."""
     cf.refresh(parse_args())
     process_files()
