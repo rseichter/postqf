@@ -86,19 +86,22 @@ class Test(PostqfTestCase):
         self.assertTrue(process_files())
 
     def test_process_and_report_rcpt(self):
-        cf.infile = [self.qdata]
-        cf.outfile = '-'
         cf.report_rcpt = True
-        self.assertTrue(process_files())
+        self.assertTrue(self._process())
 
     def test_process_and_report_rdom(self):
-        cf.infile = [self.qdata]
-        cf.outfile = '-'
         cf.report_rdom = True
-        self.assertTrue(process_files())
+        self.assertTrue(self._process())
 
     def test_process_and_report_reason(self):
-        cf.infile = [self.qdata]
-        cf.outfile = '-'
         cf.report_reason = True
-        self.assertTrue(process_files())
+        self.assertTrue(self._process())
+
+    def _process(self) -> bool:
+        tmp = NamedTemporaryFile(delete=False)
+        tmp.close()
+        cf.outfile = tmp.name
+        cf.infile = [self.qdata]
+        r = process_files()
+        os.unlink(tmp.name)
+        return r
