@@ -145,30 +145,33 @@ Custom output (mutually exclusive):
 
 ## Installation
 
-The only installation requirement is Python 3.7 or newer. PostQF is distributed via
-[PyPI.org](https://pypi.org/project/postqf/) and is typically installed using either _pip_ or _pip3_, depending on your
+The only installation requirement is Python version 3.7 or newer. PostQF is distributed via
+[PyPI.org](https://pypi.org/project/postqf/) and can be installed using either _pip_ or _pip3_, depending on your
 Python distribution.
 
-I also provide an installer script as an alternative. It will download the latest PostQF release into the current
-directory, and generate an executable launcher. A small disadvantage of this method is that it will not check if you
-have a supported Python version installed.
+I also provide an installer script. It will download the latest PostQF release into the current directory,
+and generate an executable launcher. When in doubt, choose this method. Note that you do not need to install
+PostQF as 'root', and I recommend using an unprivileged user account.
 
 ```bash
-# Typical: Installation using 'pip'.
-pip install postqf
-```
-
-The _pip_ installation process also adds a `postqf` launcher executable. The exact location depends on your Python
-distribution, and you might need to modify your PATH environment variable for easy access.
-
-```bash
-# Alternative: Official installation script.
-mkdir ~/postqf
-cd ~/postqf
+# Method 1: Official installation script.
+mkdir /path/to/somedir
+cd /path/to/somedir
 # Download and run the install script. If successful, it will print a message
-# similar to "You can now launch PostQF using /home/alice/postqf/postqf".
+# similar to "You can now launch PostQF using /path/to/somedir/postqf".
 curl -fL https://github.com/rseichter/postqf/raw/master/scripts/install.sh | bash
 ```
+
+```bash
+# Method 2: Python virtual environment.
+mkdir /path/to/somedir
+cd /path/to/somedir
+python3 -m venv venv
+venv/bin/pip install postqf
+```
+
+The _pip_ installation process also adds a launcher executable like `venv/bin/postqf`. You might want to modify
+your PATH environment variable for easy access.
 
 ## Contact
 
