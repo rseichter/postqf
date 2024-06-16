@@ -1,6 +1,6 @@
 # PostQF
 
-<sup>Copyright © 2022 Ralph Seichter</sup>
+<sup>Copyright © 2022,2024 Ralph Seichter</sup>
 
 PostQF is a user-friendly [Postfix](http://www.postfix.org/) queue data filter which operates on data produced by
 [postqueue -j](http://www.postfix.org/postqueue.1.html). See the manual page's subsection titled "JSON object format"
@@ -167,7 +167,7 @@ mkdir ~/postqf
 cd ~/postqf
 # Download and run the install script. If successful, it will print a message
 # similar to "You can now launch PostQF using /home/alice/postqf/postqf".
-curl -fL https://github.com/rseichter/postqf/raw/master/scripts/install | bash
+curl -fL https://github.com/rseichter/postqf/raw/master/scripts/install.sh | bash
 ```
 
 ## Contact
