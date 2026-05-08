@@ -11,12 +11,12 @@ jobs:
     name: Build and test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: 3.7
+          python-version: 3.14
 
       - name: Install dependencies
         run: |
@@ -32,7 +32,7 @@ jobs:
 
       - if: github.event.ref_type == 'tag'
         name: Store Python artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: python-artifacts
           path: dist/*
@@ -44,13 +44,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Retrieve pre-built Python artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
 
       - name: Prepare dist directory
         run: mv python-artifacts dist
 
       - name: Publish to PyPI test repository
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@release/v1.14.0
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN_TESTREPO }}
