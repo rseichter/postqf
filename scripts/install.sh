@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# vim: ft=sh ts=4 sw=4 noet
+# vim: ft=bash ts=4 sw=4 noet
 #
 # Install PostQF from source tarball and create a launcher
 # script # in the current working directory.
